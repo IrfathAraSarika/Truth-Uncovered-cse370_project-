@@ -379,7 +379,7 @@
             <div class="logo">
                 <div class="logo-icon">🛡️</div>
             </div>
-            <h1 class="brand-name">Truth Uncovered</h1>
+            <h1 class="brand-name">Truth Uncovered Sarika Testing</h1>
             <p class="tagline">Empowering Bangladesh Through Transparency</p>
             <p class="mission-text">A secure platform for citizens to report corruption, hazards, and human rights violations safely and anonymously.</p>
         </div>
