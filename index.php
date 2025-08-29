@@ -1,3 +1,23 @@
+<?php
+session_start();
+include 'DBconnect.php';
+// Fetch all users (or just the logged-in user)
+$sql = "SELECT User_ID, Name, Email, Password, Role FROM Users";
+$result = $conn->query($sql);
+$users = $result->fetch_all(MYSQLI_ASSOC);
+
+// Get logged-in user's role
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    foreach ($users as $user) {
+        if ($user['User_ID'] == $user_id) {
+            $_SESSION['role'] = $user['Role']; 
+            break;
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -858,23 +878,29 @@
     </div>
 
     <!-- Header -->
-    <header>
-        <nav class="container">
-            <div class="logo">🔍 Truth Uncovered</div>
+<header>
+    <nav class="container">
+        <div class="logo">🔍 Truth Uncovered</div>
+        
+        <div class="user-profile">
+            <button class="notification-badge" onclick="toggleNotifications()">
+                🔔
+                <span class="badge-count" id="notificationCount">3</span>
+            </button>
             
-            <div class="user-profile">
-                <button class="notification-badge" onclick="toggleNotifications()">
-                    🔔
-                    <span class="badge-count" id="notificationCount">3</span>
-                </button>
-                
-                <div class="user-info">
-                    <div class="user-name" id="userName">Rahim Ahmed</div>
-                    <div class="user-role" id="userRole">Citizen</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">
+                    <?php 
+                        echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : "Guest";
+                    ?>
                 </div>
+                <div class="user-role" id="userRole">
+        <?php echo isset($_SESSION['role']) ? htmlspecialchars($_SESSION['role']) : "Citizen"; ?>
+    </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
     <!-- Main Content -->
     <main class="container">
