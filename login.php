@@ -576,7 +576,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <!-- Sign Up Link -->
             <div class="signup-link">
-                New investigator? <a href="#">Request Access</a>
+                New investigator? <a href="signup.php">Request Access</a>
             </div>
         </div>
     </div>

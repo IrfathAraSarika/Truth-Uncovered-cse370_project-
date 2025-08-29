@@ -699,7 +699,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Login Link -->
             <div class="login-link">
-                Already an investigator? <a href="#">Access Portal</a>
+                Already an investigator? <a href="login.php">Access Portal</a>
             </div>
         </div>
     </div>
