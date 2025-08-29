@@ -11,10 +11,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 // } else {
-//     echo "Connection successful<br>";
+//      echo "Connection successful<br>";
 }
 
-// Your query
-$sql = "SELECT User_ID, Name, Email, Phone FROM Users";
-$result = $conn->query($sql);
+
 ?>

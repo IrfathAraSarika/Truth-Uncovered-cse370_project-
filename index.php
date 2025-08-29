@@ -19,7 +19,7 @@ include 'DBconnect.php';  // connect to DB
       <th>ID</th>
       <th>Name</th>
       <th>Email</th>
-      <th>Phone</th>
+      <th>Password</th>
     </tr>
     <?php
     if ($result && $result->num_rows > 0) {
@@ -28,7 +28,7 @@ include 'DBconnect.php';  // connect to DB
                     <td>" . $row["User_ID"] . "</td>
                     <td>" . $row["Name"] . "</td>
                     <td>" . $row["Email"] . "</td>
-                    <td>" . $row["Phone"] . "</td>
+                    <td>" . $row["Password"] . "</td>
                   </tr>";
         }
     } else {
