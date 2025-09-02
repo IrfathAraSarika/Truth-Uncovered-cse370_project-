@@ -911,7 +911,7 @@ if (isset($_GET['logout'])) {
     <nav class="container">
         <div class="logo">🔍 Truth Uncovered</div>
         
-        <div class="user-profile">
+        <div class="user-profile" onclick="window.location.href='profile.php';">
             <button class="notification-badge" onclick="toggleNotifications()">
                 🔔
                 <span class="badge-count" id="notificationCount">3</span>
