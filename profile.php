@@ -1,9 +1,103 @@
+<?php
+session_start();
+include 'DBconnect.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT * FROM Users WHERE User_ID = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 1) {
+    $user = $result->fetch_assoc();
+} else {
+    echo "User not found!";
+    exit();
+}
+$sub_sms = !empty($user['Sub_SMS']) && $user['Sub_SMS'] != 0;
+$sub_email = !empty($user['Sub_Email']) && $user['Sub_Email'] != 0;
+$sub_blog = !empty($user['Sub_Blog_Following']) && $user['Sub_Blog_Following'] != 0;
+
+// Handle profile update if POST data is sent
+$input = json_decode(file_get_contents('php://input'), true);
+if ($input) {
+    $sql = "UPDATE Users SET 
+        Name = ?, 
+        Email = ?, 
+        Phone = ?, 
+        DOB = ?, 
+        Gender = ?, 
+        Street = ?, 
+        City = ?, 
+        Region = ?, 
+        Postal_Code = ?
+        WHERE User_ID = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param(
+        "sssssssssi",
+        $input['name'],
+        $input['email'],
+        $input['phone'],
+        $input['dob'],
+        $input['gender'],
+        $input['street'],
+        $input['city'],
+        $input['region'],
+        $input['postal_code'],
+        $user_id
+    );
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => $stmt->error]);
+    }
+    exit(); 
+}
+
+
+// Get JSON input
+$input = json_decode(file_get_contents('php://input'), true);
+
+// Handle account deletion
+if ($input && isset($input['action']) && $input['action'] === 'delete_account') {
+    if (isset($input['user_id'])) {
+        $user_id = intval($input['user_id']); // sanitize user_id
+
+        $stmt = $conn->prepare("DELETE FROM Users WHERE User_ID = ?");
+        $stmt->bind_param("i", $user_id);
+
+        if ($stmt->execute()) {
+            session_destroy(); // logout user
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $stmt->error]);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'User ID not provided']);
+    }
+    exit(); // Stop further HTML output for AJAX
+}
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile - TrustHub</title>
+    <title>User Profile - Truth Uncovered</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -571,7 +665,7 @@
     <header>
         <div class="container">
             <nav>
-                <div class="logo">TrustHub</div>
+                <div class="logo">TruthUncovered</div>
                 <div class="nav-actions">
                     <a href="index.php" class="back-button">← Back to Home Page</a>
                 </div>
@@ -582,14 +676,14 @@
     <main>
         <div class="container">
             <!-- Profile Header -->
-            <div class="profile-header">
-                <div class="profile-content">
-                    <div class="profile-avatar">👤</div>
-                    <h1 class="profile-name" id="userName">John Doe</h1>
-                    <div class="profile-role" id="userRole">Citizen</div>
-                    <div class="profile-id">User ID: <span id="userId">#001</span></div>
-                </div>
-            </div>
+         <div class="profile-header">
+    <div class="profile-content">
+        <div class="profile-avatar">👤</div>
+        <h1 class="profile-name" id="userName"><?php echo htmlspecialchars($user['Name']); ?></h1>
+        <div class="profile-role" id="userRole"><?php echo htmlspecialchars($user['Role']); ?></div>
+        <div class="profile-id">User ID: <span id="userId">#<?php echo htmlspecialchars($user['User_ID']); ?></span></div>
+    </div>
+</div>
 
             <!-- Profile Information Grid -->
             <div class="profile-grid">
@@ -799,7 +893,7 @@
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                 <button class="primary-button" onclick="saveProfile()" style="flex: 1;">Save Changes</button>
-                <button class="action-button" onclick="closeModal()" style="flex: 1;">Cancel</button>
+                <button class="action-button" onclick="closeModal()" style="flex: 1; color:black; justify-content:center">Cancel</button>
             </div>
         </div>
     </div>
@@ -835,21 +929,21 @@
     <script>
         // Profile data object to store user information
         const profileData = {
-            id: 1,
-            name: "John Doe",
-            email: "john.doe@email.com",
-            phone: "+1 (555) 123-4567",
-            dob: "1990-01-15",
-            national_id: "ID-123456789",
-            gender: "Male",
-            role: "Citizen",
-            street: "123 Main Street, Apt 4B",
-            city: "Dhaka",
-            region: "Dhaka Division",
-            postal_code: "1000",
-            sub_sms: true,
-            sub_email: true,
-            sub_blog_following: false
+        id: <?php echo (int)$user['User_ID']; ?>,
+        name: "<?php echo addslashes($user['Name']); ?>",
+        email: "<?php echo addslashes($user['Email']); ?>",
+        phone: "<?php echo addslashes($user['Phone']); ?>",
+        dob: "<?php echo addslashes($user['DOB']); ?>",
+        national_id: "<?php echo addslashes($user['National_ID']); ?>",
+        gender: "<?php echo addslashes($user['Gender']); ?>",
+        role: "<?php echo addslashes($user['Role']); ?>",
+        street: "<?php echo addslashes($user['Street']); ?>",
+        city: "<?php echo addslashes($user['City']); ?>",
+        region: "<?php echo addslashes($user['Region']); ?>",
+        postal_code: "<?php echo addslashes($user['Postal_Code']); ?>",
+        sub_sms: <?php echo $sub_sms ? 'true' : 'false'; ?>,
+        sub_email: <?php echo $sub_email ? 'true' : 'false'; ?>,
+        sub_blog_following: <?php echo $sub_blog ? 'true' : 'false'; ?>
         };
 
         // Initialize page with profile data
@@ -907,26 +1001,39 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
-        function saveProfile() {
-            // Update profile data with form values
-            profileData.name = document.getElementById('editName').value;
-            profileData.email = document.getElementById('editEmail').value;
-            profileData.phone = document.getElementById('editPhone').value;
-            profileData.dob = document.getElementById('editDob').value;
-            profileData.gender = document.getElementById('editGender').value;
-            profileData.street = document.getElementById('editStreet').value;
-            profileData.city = document.getElementById('editCity').value;
-            profileData.region = document.getElementById('editRegion').value;
-            profileData.postal_code = document.getElementById('editPostalCode').value;
-            
-            // Update display
-            updateFieldValues();
+     function saveProfile() {
+    const profileData = {
+        name: document.getElementById('editName').value,
+        email: document.getElementById('editEmail').value,
+        phone: document.getElementById('editPhone').value,
+        dob: document.getElementById('editDob').value,
+        gender: document.getElementById('editGender').value,
+        street: document.getElementById('editStreet').value,
+        city: document.getElementById('editCity').value,
+        region: document.getElementById('editRegion').value,
+        postal_code: document.getElementById('editPostalCode').value
+    };
+
+    // Send data to the same page via POST
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
             document.getElementById('userName').textContent = profileData.name;
-            
-            // Show success message
+            updateFieldValues();
             showNotification('Profile updated successfully!', 'success');
             closeModal();
+        } else {
+            showNotification('Error: ' + data.message, 'error');
         }
+    })
+    .catch(err => console.error(err));
+}
+
 
         // Password Change Functions
         function changePassword() {
@@ -999,14 +1106,30 @@
             showNotification('Profile data downloaded successfully!', 'success');
         }
 
-        function deleteAccount() {
-            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                if (confirm('This will permanently delete all your data. Are you absolutely sure?')) {
-                    showNotification('Account deletion initiated. You will receive a confirmation email.', 'warning');
-                    // In a real app, this would redirect to a deletion confirmation page
-                }
-            }
+   function deleteAccount() {
+    if (!confirm('Are you sure you want to delete your account? This action cannot be undone?')) return;
+    if (!confirm('This will permanently delete all your data. Are you absolutely sure?')) return;
+
+    showNotification('Deleting account...', 'warning');
+
+    // Send request to the same page to delete account
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_account' })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to signup page after deletion
+            window.location.href = 'signup.php';
+        } else {
+            showNotification('Error deleting account: ' + data.message, 'error');
         }
+    })
+    .catch(err => console.error(err));
+}
+
 
         // Notification System
         function showNotification(message, type = 'info') {
