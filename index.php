@@ -1,6 +1,13 @@
 <?php
 session_start();
 include 'DBconnect.php';
+
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 // Fetch all users (or just the logged-in user)
 $sql = "SELECT User_ID, Name, Email, Password, Role FROM Users";
 $result = $conn->query($sql);
