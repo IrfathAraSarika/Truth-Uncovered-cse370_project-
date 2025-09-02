@@ -7,7 +7,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 // Include the database connection or set it up
-
+function h($v) { 
+    return htmlspecialchars($v ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); 
+}
 
 // Category options
 $defaults = [
@@ -193,8 +195,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <div>
             <label class="form-label" for="content">📄 Blog Content</label>
-            <textarea id="content" name="content" class="textarea" 
-                      placeholder="Write your blog content here..." required><?= !empty($error) ? h($_POST['content'] ?? '') : '' ?></textarea>
+         <textarea id="content" name="content" class="textarea" 
+          placeholder="Write your blog content here..." required><?= isset($_POST['content']) ? h($_POST['content']) : '' ?></textarea>
+
           </div>
 
           <input type="hidden" name="csrf_token" value="<?= h($_SESSION['csrf_token']) ?>" />
