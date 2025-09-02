@@ -23,6 +23,16 @@ if (isset($_SESSION['user_id'])) {
         }
     }
 }
+
+// Check if logout link was clicked
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php"); // redirect after logout
+    exit();
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -30,6 +40,7 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Truth Uncovered - Digital Civic Platform</title>
     <style>
         * {
@@ -874,6 +885,17 @@ if (isset($_SESSION['user_id'])) {
         .close-button:hover {
             background: rgba(0, 0, 0, 0.1);
         }
+        .logout-btn {
+    margin-left: 15px;
+    font-size: 22px;
+    color: #3b82f6;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.logout-btn:hover {
+    color: #e63946; /* red on hover */
+    transform: scale(1.15);
+}
     </style>
 </head>
 <body>
@@ -904,8 +926,19 @@ if (isset($_SESSION['user_id'])) {
                 <div class="user-role" id="userRole">
         <?php echo isset($_SESSION['role']) ? htmlspecialchars($_SESSION['role']) : "Citizen"; ?>
     </div>
+    
             </div>
+              <!-- logout icon  -->
+         <span>
+<?php if (isset($_SESSION['user_id'])): ?>
+    <a href="?logout=1" class="logout-btn" title="Logout">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </a>
+<?php endif; ?>
+</span>
         </div>
+
+
     </nav>
 </header>
 
