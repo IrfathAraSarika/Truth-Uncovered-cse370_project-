@@ -116,6 +116,7 @@ if (isset($_GET['logout'])) {
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            cursor:pointer;
         }
 
         .user-profile {
@@ -909,7 +910,7 @@ if (isset($_GET['logout'])) {
     <!-- Header -->
 <header>
     <nav class="container">
-        <div class="logo">🔍 Truth Uncovered</div>
+        <div class="logo"  >🔍 TruthUncovered</div>
         
         <div class="user-profile" onclick="window.location.href='profile.php';">
             <button class="notification-badge" onclick="toggleNotifications()">
@@ -976,9 +977,17 @@ if (isset($_GET['logout'])) {
                     </div>
                 </div>
                 
-                <button class="explore-button" onclick="scrollToCategories()">
-                    🚀 Start Making a Difference
-                </button>
+           <button class="explore-button" 
+        title="Go to the blog creation page" 
+        onclick="window.location.href='blogposts.php'" 
+        style="display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #fff; cursor: pointer;">
+    <!-- SVG icon: pencil/edit for creating a post -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+    </svg>
+    Start Writing Your Blog
+</button>
+
             </div>
         </section>
 
