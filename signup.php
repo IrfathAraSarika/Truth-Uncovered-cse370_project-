@@ -536,7 +536,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div id="messageContainer" style="display: none;"></div>
 
             <!-- Signup Form -->
-            <form method="POST" action="" id="signupForm">
+            <form method="POST" action="login.php" id="signupForm">
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="name">Full Name</label>

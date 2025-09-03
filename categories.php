@@ -2,15 +2,12 @@
 <?php
 session_start();
 
-// Reuse DB connector if available
-if (file_exists(__DIR__ . '/DBconnect.php')) {
-    include __DIR__ . '/DBconnect.php';
-} else {
-    $conn = new mysqli('localhost', 'root', '', 'truth_uncovered');
-}
+include 'DBconnect.php';
 
-if ($conn->connect_error) {
-    die('Connection failed: ' . $conn->connect_error);
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
 mysqli_report(MYSQLI_REPORT_OFF);
 
@@ -221,5 +218,4 @@ if ($selectedInfo) {
     </section>
 </main>
 </body>
-categories.php
-Displaying categories.php.
+

@@ -987,7 +987,15 @@ if (isset($_GET['logout'])) {
     </svg>
     Start Writing Your Blog
 </button>
-
+<button class="explore-button" 
+                title="Go to the report submission page" 
+                onclick="window.location.href='report.php'" 
+                style="display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; cursor: pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                Submit a Report
+            </button>
             </div>
         </section>
 
@@ -1574,24 +1582,8 @@ if (isset($_GET['logout'])) {
         </div>
         <button style="width: 100%; padding: 0.8rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; border: none; border-radius: 12px; margin-top: 1rem; cursor: pointer; font-weight: 500;">View All Notifications</button>
     </div>
-
+<!-- 
     <!-- Report Modal -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <button class="close-button" onclick="closeModal('reportModal')">&times;</button>
-            <h3 style="margin-bottom: 1.5rem; color: #1f2937; font-size: 1.5rem; font-weight: 700;">📝 Submit New Report</h3>
-            <form>
-                <div class="form-group">
-                    <label class="form-label">Report Category:</label>
-                    <select class="form-select" id="reportCategory">
-                        <option value="">Select a category...</option>
-                        <option value="corruption">💰 Corruption</option>
-                        <option value="harassment">🚫 Harassment</option>
-                        <option value="safety">⚠️ Safety Hazard</option>
-                        <option value="fraud">🔍 Fraud</option>
-                        <option value="misconduct">⚖️ Misconduct</option>
-                        <option value="environment">🌍 Environmental</option>
-                    </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Report Title:</label>
@@ -1616,7 +1608,7 @@ if (isset($_GET['logout'])) {
                 </button>
             </form>
         </div>
-    </div>
+    </div> -->
 
     <!-- Emergency Report Modal -->
     <div id="emergencyModal" class="modal">
