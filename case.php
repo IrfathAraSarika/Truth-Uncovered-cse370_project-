@@ -39,7 +39,7 @@ if (isset($_SESSION['category_id'])) {
       background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e, #0f3460, #1e3a8a);
       color: #fff;
       min-height: 100vh;
-      padding: 30px;
+     
     }
     .container { max-width: 1200px; margin: auto; }
     h1 { text-align: center; margin-bottom: 20px; }
@@ -71,9 +71,10 @@ if (isset($_SESSION['category_id'])) {
      margin-top: 10px;
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* same as 1fr 1fr 1fr */
-    gap: 20px; /* spacing between cards */
+    gap: 15px; /* spacing between cards */
         justify-items: center; /* center each card horizontally */
     text-align: center;
+  padding:25px;
 }
     .timeline { font-size: 0.9rem; margin-top: 10px; }
     .timeline div { margin-bottom: 5px; }
@@ -86,6 +87,7 @@ if (isset($_SESSION['category_id'])) {
             padding: 1.5rem;
             transition: all 0.4s ease;
             cursor: pointer;
+            width: 400px;
         }
 
         .feature-item:hover {
@@ -110,11 +112,76 @@ if (isset($_SESSION['category_id'])) {
             color: #cbd5e1;
             font-size: 0.9rem;
         }
+.button-container {
+  width: 100%;
+   position:relative;
+}
+.btn {
+  right:0;
+  position:absolute;
+}
+     header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+              nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+            .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor:pointer;
+        }
 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+                .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="">
+     <header>
+        <div class="container">
+            <nav>
+                <div class="logo"   onclick="window.location.href='index.php'">TruthUncovered</div>
+                <div class="nav-actions">
+                    <a href="categories.php" class="back-button">← Back to Categories Page</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+
+
 <h1>
     Case Management 
     <?php if (isset($_SESSION['category_name'])): ?>

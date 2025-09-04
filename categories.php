@@ -381,7 +381,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'], $_POST
             }
         }
 
-        /* Responsive Design */
+  header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+              nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+            .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor:pointer;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+                .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .wrapper {
+           max-width: 1200px; margin: auto;
+        }
+
+        /* Responsive Design mobile*/
         @media (max-width: 768px) {
             .main-title {
                 font-size: 2rem;
@@ -413,9 +462,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'], $_POST
         <div class="floating-orb orb3"></div>
     </div>
 
+     <header>
+        <div class="wrapper">
+            <nav>
+                <div class="logo"   onclick="window.location.href='index.php'">TruthUncovered</div>
+                <div class="nav-actions">
+                    <a href="index.php" class="back-button">← Back to Home Page</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
     <!-- Main Container -->
     <div class="container">
         <!-- Header Section -->
+         
+
+
         <div class="header"    onclick="window.location.href='index.php'" >
             <div class="logo-icon"></div>
             <h1 class="main-title">TRUTH UNCOVERED</h1>
