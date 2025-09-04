@@ -1,71 +1,14 @@
 <?php
 session_start();
 include 'DBconnect.php';
-
-// ✅ Create Case
-function createCase($pdo, $data) {
-    $stmt = $pdo->prepare("
-        INSERT INTO cases (Report_ID, Status, Assigned_Agency, Timeline) 
-        VALUES (?, 'Received', ?, ?)
-    ");
-
-    $timeline = json_encode([
-        ["status" => "Received", "date" => date("Y-m-d H:i:s"), "note" => "Case created by admin"]
-    ]);
-
-    return $stmt->execute([
-        $data['report_id'],
-        $data['assigned_agency'],
-        $timeline
-    ]);
-}
-
-// ✅ Update Case
-function updateCase($pdo, $data) {
-    $stmt = $pdo->prepare("SELECT Timeline FROM cases WHERE Case_ID = ?");
-    $stmt->execute([$data['case_id']]);
-    $row = $stmt->fetch();
-
-    $timeline = $row ? json_decode($row['Timeline'], true) : [];
-
-    $timeline[] = [
-        "status" => $data['status'],
-        "date" => date("Y-m-d H:i:s"),
-        "note" => $data['note']
-    ];
-
-    $update = $pdo->prepare("UPDATE cases SET Status = ?, Timeline = ? WHERE Case_ID = ?");
-    return $update->execute([
-        $data['status'],
-        json_encode($timeline),
-        $data['case_id']
-    ]);
-}
-
-// ✅ Handle Form Submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['create_case'])) {
-        if (createCase($conn, $_POST)) {
-            $_SESSION['notification'] = "✅ Case created successfully.";
-        } else {
-            $_SESSION['notification'] = "❌ Failed to create case.";
-        }
-    }
-
-    if (isset($_POST['update_case'])) {
-        if (updateCase($conn, $_POST)) {
-            $_SESSION['notification'] = "✅ Case updated successfully.";
-        } else {
-            $_SESSION['notification'] = "❌ Failed to update case.";
-        }
-    }
-
-    header("Location: case.php");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
     exit();
 }
 
+
 // ✅ Fetch all cases (no Created_At, so order by Case_ID)
-$result = $conn->query("SELECT * FROM cases ORDER BY Case_ID DESC");
+$result = $conn->query("SELECT Title, Description, Date_Submitted FROM reports");
 $cases = $result->fetch_all(MYSQLI_ASSOC);
 
 ?>
@@ -105,9 +48,54 @@ $cases = $result->fetch_all(MYSQLI_ASSOC);
       color: white; font-weight: bold; cursor: pointer;
     }
     button:hover { opacity: 0.9; }
-    .case-list { margin-top: 40px; }
+    .title {
+        margin-top: 40px;
+        text-align:center;
+    }
+   .case-list {
+     margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* same as 1fr 1fr 1fr */
+    gap: 20px; /* spacing between cards */
+        justify-items: center; /* center each card horizontally */
+    text-align: center;
+}
     .timeline { font-size: 0.9rem; margin-top: 10px; }
     .timeline div { margin-bottom: 5px; }
+
+  .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
   </style>
 </head>
 <body>
@@ -189,47 +177,27 @@ $cases = $result->fetch_all(MYSQLI_ASSOC);
   </div>
 
   <!-- List Cases -->
-  <div class="case-list">
-    <h2>Existing Cases</h2>
+     <h2 class="title">Existing Cases</h2>
+<div class="case-list"> 
+  
     <?php foreach ($cases as $case): ?>
-      <div class="card">
-        <h3>Case #<?= $case['Case_ID'] ?> (Report #<?= $case['Report_ID'] ?>)</h3>
-        <p><b>Status:</b> <?= $case['Status'] ?></p>
-        <p><b>Assigned Agency:</b> <?= $case['Assigned_Agency'] ?></p>
-        <div class="timeline">
-          <b>Timeline:</b>
-          <?php 
-          $timeline = json_decode($case['Timeline'], true);
-          if ($timeline) {
-              foreach ($timeline as $t) {
-                  echo "<div>📌 {$t['status']} — {$t['date']} ({$t['note']})</div>";
-              }
-          }
-          ?>
+        <div class="feature-item">
+            <!-- Generic icon -->
+          <span class="feature-icon">🔒</span>
+
+            <!-- Report Title -->
+            <div class="feature-title">Title: <?= htmlspecialchars($case['Title']) ?></div>
+
+            <!-- Report Description + Date -->
+            <div class="feature-desc">
+                Descripton: <?= nl2br(htmlspecialchars($case['Description'])) ?><br>
+                <small><b>Submitted On:</b> <?= date('F j, Y', strtotime($case['Date_Submitted'])) ?></small>
+            </div>
         </div>
-
-        <!-- Update Form -->
-        <form method="POST" style="margin-top:15px;">
-          <input type="hidden" name="update_case" value="1">
-          <input type="hidden" name="case_id" value="<?= $case['Case_ID'] ?>">
-
-          <label>Update Status</label>
-          <select name="status" required>
-            <option value="Received">Received</option>
-            <option value="Verified">Verified</option>
-            <option value="Under Investigation">Under Investigation</option>
-            <option value="Action Taken">Action Taken</option>
-            <option value="Closed">Closed</option>
-          </select>
-
-          <label>Note</label>
-          <textarea name="note" placeholder="Add a note..."></textarea>
-
-          <button type="submit">Update Case</button>
-        </form>
-      </div>
     <?php endforeach; ?>
-  </div>
+</div>
+
+
 </div>
 </body>
 </html>
