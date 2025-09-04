@@ -1,5 +1,12 @@
 <?php
+session_start();
 include 'DBconnect.php';
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
+    // Redirect non-admin users
+    header("Location: profile.php");
+    exit();
+}
 
 // Fetch analytics data (you'll need to implement these queries based on your database structure)
 function getAnalyticsData($pdo, $type = 'all') {
@@ -109,7 +116,55 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
             overflow-x: hidden;
             color: #ffffff;
         }
+   header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+              nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+            .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor:pointer;
+        }
 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+                .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .container {
+            max-width:1200px;
+            margin:auto;
+        }
         /* Background Image Layer */
         .background-image {
             position: fixed;
@@ -531,6 +586,18 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
     </style>
 </head>
 <body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo"   onclick="window.location.href='index.php'">TruthUncovered</div>
+                <div class="nav-actions">
+                    <a href="categories.php" class="back-button">← Back to Categories Page</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
     <!-- Background Image Layer -->
     <div class="background-image"></div>
 

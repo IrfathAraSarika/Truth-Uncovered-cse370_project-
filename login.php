@@ -5,7 +5,7 @@ include 'DBconnect.php';
 $message = "";
 
 // Your query (fetch all users once)
-$sql = "SELECT User_ID, Name, Email, Password FROM Users";
+$sql = "SELECT User_ID, Name, Email,Role, Password FROM Users";
 $result = $conn->query($sql);
 $users = $result->fetch_all(MYSQLI_ASSOC);
 
@@ -25,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['user_id'] = $user['User_ID'];
                 $_SESSION['email']   = $user['Email'];
                  $_SESSION['username'] = $user['Name'];
+                  $_SESSION['role'] = $user['Role'];
                 header("Location: index.php");
                 exit;
             }
@@ -32,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             elseif ($password === $user['Password']) {
                 $_SESSION['user_id'] = $user['User_ID'];
                 $_SESSION['email']   = $user['Email'];
-                  $_SESSION['username'] = $user['Name'];
+                  $_SESSION['username'] = $user['Role'];
                 header("Location: index.php");
                 exit;
             }
