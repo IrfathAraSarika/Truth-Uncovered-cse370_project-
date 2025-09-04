@@ -32,8 +32,33 @@ function createReport($conn, $data, $files) {
     $file_path_str = implode(",", $file_paths);
 
 
-
+$mode = $_GET['mode'] ?? null;
     // Insert into reports (added file_path column)
+
+if ($mode) {
+    // Insert with Mode
+    $stmt = $conn->prepare("
+        INSERT INTO reports 
+        (Title, Description, Date_Submitted, Status, Incident_Address, Incident_Date, Incident_Time, Category_ID, User_ID, file_path, Mode) 
+        VALUES (?, ?, NOW(), 'Draft', ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    if (!$stmt) die("Prepare failed: " . $conn->error);
+
+    $stmt->bind_param(
+        "sssssiiss",
+        $data['title'],
+        $data['description'],
+        $data['address'],
+        $data['incident_date'],
+        $data['incident_time'],
+        $data['category'],
+        $data['user_id'],
+        $file_path_str,
+        $mode
+    );
+} else {
+    // Normal insert (no Mode column)
     $stmt = $conn->prepare("
         INSERT INTO reports 
         (Title, Description, Date_Submitted, Status, Incident_Address, Incident_Date, Incident_Time, Category_ID, User_ID, file_path) 
@@ -53,6 +78,7 @@ function createReport($conn, $data, $files) {
         $data['user_id'],
         $file_path_str
     );
+}
 
     $success = $stmt->execute();
     if (!$success) die("Execute failed: " . $stmt->error);
@@ -157,7 +183,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
   <div class="report-box">
 
-    <h1>Submit a Report</h1>
+  <h1>
+    Submit a Report
+    <?php if (isset($_GET['mode'])): ?>
+        - <?= htmlspecialchars($_GET['mode']) ?>
+    <?php endif; ?>
+</h1>
 
 
 

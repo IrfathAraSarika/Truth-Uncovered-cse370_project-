@@ -1007,7 +1007,7 @@ if (!empty($_SESSION['notification'])): ?>
                 </p>
                 
                 <div class="platform-features">
-                    <div class="feature-item">
+                    <div class="feature-item" onclick="window.location.href='report.php?mode=anonymous'" > 
                         <span class="feature-icon">🔒</span>
                         <div class="feature-title">Anonymous Reporting</div>
                         <div class="feature-desc">Complete privacy protection with end-to-end encryption</div>
