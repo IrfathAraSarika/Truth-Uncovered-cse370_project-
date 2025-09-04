@@ -12,7 +12,7 @@ if (isset($_SESSION['category_id'])) {
     $category_id = (int) $_SESSION['category_id']; // safe cast to int
 
     // Fetch reports only for this category
-    $stmt = $conn->prepare("SELECT Title, Description, Date_Submitted 
+    $stmt = $conn->prepare("SELECT Title, Description, Date_Submitted, Mode
                             FROM reports 
                             WHERE Category_ID = ?");
     $stmt->bind_param("i", $category_id);
@@ -270,7 +270,10 @@ if (isset($_SESSION['category_id'])) {
     <?php foreach ($cases as $case): ?>
         <div class="feature-item">
             <!-- Generic icon -->
-          <span class="feature-icon">🔒</span>
+       <span class="feature-icon">
+    <?= !empty($case['Mode']) ? '🔒' : '👤' ?>
+</span>
+
 
             <!-- Report Title -->
             <div class="feature-title">Title: <?= htmlspecialchars($case['Title']) ?></div>
@@ -278,8 +281,14 @@ if (isset($_SESSION['category_id'])) {
             <!-- Report Description + Date -->
             <div class="feature-desc">
                 Descripton: <?= nl2br(htmlspecialchars($case['Description'])) ?><br>
-                <small><b>Submitted On:</b> <?= date('F j, Y', strtotime($case['Date_Submitted'])) ?></small>
+               
             </div>
+            <div class="feature-desc">
+           <p><b>Author:</b> <?= !empty($case['Mode']) ? htmlspecialchars($case['Mode']) : htmlspecialchars($_SESSION['username'] ?? 'Unknown') ?></p>
+
+            <small><b>Submitted On:</b> <?= date('F j, Y', strtotime($case['Date_Submitted'])) ?></small>
+            </div>
+           
         </div>
     <?php endforeach; ?>
 </div>
