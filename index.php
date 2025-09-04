@@ -934,6 +934,33 @@ if (isset($_GET['logout'])) {
 .toast.error {
     background-color: #ef4444;
 }
+    nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+                .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+                .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
 
     </style>
 </head>
@@ -947,16 +974,24 @@ if (isset($_GET['logout'])) {
 
     <!-- Header -->
 <header>
-    <nav class="container">
+    <div class="container"> 
+    <nav >
         <div class="logo"  >🔍 TruthUncovered</div>
         
-        <div class="user-profile" onclick="window.location.href='profile.php';">
+        <div class="user-profile">
+
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                <div class="nav-actions">
+                    <a href="analytic.php" class="back-button">Analytics Dashboard</a>
+                </div>
+            <?php endif; ?>
+
             <button class="notification-badge" onclick="toggleNotifications()">
                 🔔
                 <span class="badge-count" id="notificationCount">3</span>
             </button>
             
-            <div class="user-info">
+            <div class="user-info"  onclick="window.location.href='profile.php';">
                 <div class="user-name" id="userName">
                     <?php 
                         echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : "Guest";
@@ -982,6 +1017,7 @@ if (isset($_GET['logout'])) {
 
 
     </nav>
+</div>
 </header>
 
     <!-- Main Content -->
@@ -1288,160 +1324,13 @@ if (!empty($_SESSION['notification'])): ?>
             </div>
         </section>
 
-        <!-- User Subscriptions Management -->
-        <section class="glass-widget">
-            <h3 class="widget-title">📧 Subscription Preferences</h3>
-            <div style="display: grid; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);">
-                    <div>
-                        <div style="font-weight: 600; color: #ffffff;">📱 SMS Notifications</div>
-                        <div style="font-size: 0.9rem; color: #cbd5e1;">Receive case updates via SMS</div>
-                    </div>
-                    <label style="position: relative; display: inline-block; width: 60px; height: 34px;">
-                        <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #10b981, #059669); border-radius: 34px; transition: 0.4s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);"></span>
-                        <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.4s;"></span>
-                    </label>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);">
-                    <div>
-                        <div style="font-weight: 600; color: #ffffff;">📧 Email Updates</div>
-                        <div style="font-size: 0.9rem; color: #cbd5e1;">Weekly digest and important alerts</div>
-                    </div>
-                    <label style="position: relative; display: inline-block; width: 60px; height: 34px;">
-                        <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #10b981, #059669); border-radius: 34px; transition: 0.4s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);"></span>
-                        <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.4s;"></span>
-                    </label>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);">
-                    <div>
-                        <div style="font-weight: 600; color: #ffffff;">📝 Blog Notifications</div>
-                        <div style="font-size: 0.9rem; color: #cbd5e1;">New articles and research updates</div>
-                    </div>
-                    <label style="position: relative; display: inline-block; width: 60px; height: 34px;">
-                        <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
-                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(107, 114, 128, 0.3); border-radius: 34px; transition: 0.4s;"></span>
-                        <span style="position: absolute; content: ''; height: 26px; width: 26px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.4s;"></span>
-                    </label>
-                </div>
-            </div>
-        </section>
 
-        <!-- Search and Filter Reports -->
-        <section class="glass-widget">
-            <h3 class="widget-title">🔍 Search & Filter Reports</h3>
-            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                <input type="text" placeholder="Search reports by title, location, or keywords..." style="flex: 1; padding: 0.8rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #ffffff;">
-                <select style="padding: 0.8rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #ffffff;">
-                    <option value="">All Categories</option>
-                    <option value="corruption">Corruption</option>
-                    <option value="harassment">Harassment</option>
-                    <option value="safety">Safety</option>
-                    <option value="fraud">Fraud</option>
-                    <option value="misconduct">Misconduct</option>
-                    <option value="environment">Environmental</option>
-                </select>
-            </div>
-            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
-                <button class="action-button" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;">All Time</button>
-                <button class="action-button" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;">This Month</button>
-                <button class="action-button" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;">This Week</button>
-                <button class="action-button" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.9rem;">My Region</button>
-            </div>
-        </section>
 
-        <!-- Advanced Analytics & Insights -->
-        <section class="glass-widget">
-            <h3 class="widget-title">📈 Advanced Analytics & Insights</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                <div class="metric-card">
-                    <div class="metric-value">₹2.1M</div>
-                    <div class="metric-label">Funds Recovered</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">156</div>
-                    <div class="metric-label">Cases This Month</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">24h</div>
-                    <div class="metric-label">Avg Response Time</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">94%</div>
-                    <div class="metric-label">User Satisfaction</div>
-                </div>
-            </div>
-            
-            <!-- Trend Analysis -->
-            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📊 Trend Analysis</h4>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="color: #cbd5e1;">Corruption Reports:</span>
-                    <span style="color: #ef4444; font-weight: 600;">↗️ +12% this month</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="color: #cbd5e1;">Resolution Rate:</span>
-                    <span style="color: #10b981; font-weight: 600;">↗️ +5% improvement</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #cbd5e1;">Response Time:</span>
-                    <span style="color: #10b981; font-weight: 600;">↘️ -3 hours faster</span>
-                </div>
-            </div>
+  
 
-            <!-- Bribe Calculator Widget -->
-            <div style="background: rgba(239, 68, 68, 0.1); backdrop-filter: blur(15px); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 1.5rem;">
-                <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">💰 Bribe Impact Calculator</h4>
-                <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 1rem;">
-                    Calculate the social impact of unreported corruption in your area
-                </p>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <input type="number" placeholder="Amount (৳)" style="flex: 1; padding: 0.8rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #ffffff;">
-                    <button class="action-button" style="width: auto; margin: 0; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); color: #ef4444;">Calculate Impact</button>
-                </div>
-            </div>
-        </section>
 
-        <!-- Evidence Guidelines & Upload -->
-        <section class="glass-widget">
-            <h3 class="widget-title">📎 Evidence Management Center</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-                <div>
-                    <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📋 Upload Guidelines</h4>
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1.2rem;">
-                        <div style="margin-bottom: 0.8rem; color: #cbd5e1;">
-                            <strong style="color: #10b981;">✅ Accepted Formats:</strong><br>
-                            • Images: JPG, PNG, WEBP (Max 10MB)<br>
-                            • Videos: MP4, MOV, AVI (Max 50MB)<br>
-                            • Documents: PDF, DOC, DOCX (Max 25MB)
-                        </div>
-                        <div style="margin-bottom: 0.8rem; color: #cbd5e1;">
-                            <strong style="color: #3b82f6;">🔒 Security Features:</strong><br>
-                            • Automatic metadata removal<br>
-                            • End-to-end encryption<br>
-                            • Anonymous storage system
-                        </div>
-                        <div style="color: #cbd5e1;">
-                            <strong style="color: #8b5cf6;">💡 Best Practices:</strong><br>
-                            • Multiple angles for photos<br>
-                            • Clear audio in videos<br>
-                            • Date and location context
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📤 Quick Upload</h4>
-                    <div class="upload-zone" onclick="triggerUpload()">
-                        <div class="upload-icon">📁</div>
-                        <div class="upload-text">Drop files here or click to upload</div>
-                        <div class="upload-subtext">
-                            Secure • Anonymous • Encrypted
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+
+ 
 
         <!-- Advanced Case Management -->
         <section class="glass-widget">
@@ -1507,42 +1396,14 @@ if (!empty($_SESSION['notification'])): ?>
             <button class="action-button primary-button">View Detailed Case Dashboard</button>
         </section>
 
-        <!-- Whistleblower Protection Center -->
-        <section class="glass-widget">
-            <h3 class="widget-title">🛡️ Whistleblower Protection Center</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                <div style="background: rgba(16, 185, 129, 0.15); backdrop-filter: blur(15px); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 1.5rem;">
-                    <h4 style="color: #10b981; margin-bottom: 1rem; font-weight: 600;">🔐 Encryption Level</h4>
-                    <div style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">AES-256</div>
-                    <div style="color: #cbd5e1; font-size: 0.9rem;">Military-grade encryption protects all your data</div>
-                </div>
-                <div style="background: rgba(59, 130, 246, 0.15); backdrop-filter: blur(15px); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 1.5rem;">
-                    <h4 style="color: #3b82f6; margin-bottom: 1rem; font-weight: 600;">⚖️ Legal Protection</h4>
-                    <div style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">Protected</div>
-                    <div style="color: #cbd5e1; font-size: 0.9rem;">Full legal backing under Bangladesh Whistleblower Protection Act</div>
-                </div>
-                <div style="background: rgba(139, 92, 246, 0.15); backdrop-filter: blur(15px); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 1.5rem;">
-                    <h4 style="color: #8b5cf6; margin-bottom: 1rem; font-weight: 600;">🔄 Anonymous Mode</h4>
-                    <div style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">Active</div>
-                    <div style="color: #cbd5e1; font-size: 0.9rem;">Zero-knowledge architecture ensures complete anonymity</div>
-                </div>
-            </div>
-            <div style="margin-top: 1.5rem; padding: 1.2rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px;">
-                <div style="color: #ffffff; font-weight: 600; margin-bottom: 0.8rem;">📞 Emergency Support</div>
-                <div style="color: #cbd5e1; font-size: 0.9rem;">
-                    If you face retaliation or need immediate protection:<br>
-                    <strong style="color: #ef4444;">Hotline: +880-1234-567890</strong> (24/7)<br>
-                    <strong style="color: #3b82f6;">Email: protection@truthuncovered.bd</strong>
-                </div>
-            </div>
-        </section>
+    
 
         <!-- Regional Performance & Institution Rankings -->
-        <section class="glass-widget">
+        <!-- <section class="glass-widget">
             <h3 class="widget-title">🌍 Regional Performance & Institution Rankings</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                <!-- Regional Performance -->
-                <div>
+                Regional Performance -->
+                <!-- <div>
                     <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📍 Regional Performance</h4>
                     <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
@@ -1585,10 +1446,10 @@ if (!empty($_SESSION['notification'])): ?>
                         </div>
                         <div style="color: #cbd5e1; font-size: 0.8rem;">87 reports • 91% resolution rate</div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Enhanced Institution Rankings -->
-                <div>
+                <!-- <div>
                     <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">🏛️ Institution Trust Scores</h4>
                     <div class="ranking-item">
                         <div>
@@ -1612,7 +1473,20 @@ if (!empty($_SESSION['notification'])): ?>
                             <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem;">
                                 <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem;">Slow Response</span>
                                 <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem;">Improving</span>
-                            
+             
+</section> -->
+    <!-- Whistleblower Protection Center -->
+        <section class="glass-widget">
+        
+            <div style="margin-top: 1.5rem; padding: 1.2rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px;">
+                <div style="color: #ffffff; font-weight: 600; margin-bottom: 0.8rem;">📞 Emergency Support</div>
+                <div style="color: #cbd5e1; font-size: 0.9rem;">
+                    If you face retaliation or need immediate protection:<br>
+                    <strong style="color: #ef4444;">Hotline: +880-1234-567890</strong> (24/7)<br>
+                    <strong style="color: #3b82f6;">Email: protection@truthuncovered.bd</strong>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Notification Panel -->
@@ -1638,31 +1512,7 @@ if (!empty($_SESSION['notification'])): ?>
         <button style="width: 100%; padding: 0.8rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; border: none; border-radius: 12px; margin-top: 1rem; cursor: pointer; font-weight: 500;">View All Notifications</button>
     </div>
 <!-- 
-    <!-- Report Modal -->
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Report Title:</label>
-                    <input type="text" class="form-input" placeholder="Brief description of the issue" maxlength="100">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Detailed Description:</label>
-                    <textarea class="form-textarea" rows="5" placeholder="Provide detailed information about the incident, including when and where it occurred..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Location:</label>
-                    <input type="text" class="form-input" placeholder="City, District, or specific address">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" style="margin-right: 0.5rem;"> 
-                        Submit anonymously (recommended)
-                    </label>
-                </div>
-                <button type="submit" class="primary-button" style="width: 100%; margin-top: 1rem;">
-                    🚀 Submit Report Securely
-                </button>
-            </form>
-        </div>
+
     </div> -->
 
     <!-- Emergency Report Modal -->

@@ -172,7 +172,7 @@ if (isset($_SESSION['category_id'])) {
      <header>
         <div class="container">
             <nav>
-                <div class="logo"   onclick="window.location.href='index.php'">TruthUncovered</div>
+                <div class="logo"   onclick="window.location.href='index.php'">🔍 TruthUncovered</div>
                 <div class="nav-actions">
                     <a href="categories.php" class="back-button">← Back to Categories Page</a>
                 </div>
