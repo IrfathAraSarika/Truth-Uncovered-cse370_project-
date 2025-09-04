@@ -907,6 +907,33 @@ if (isset($_GET['logout'])) {
     align-items:center;
     gap:10px;
 }
+
+   .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #22c55e; /* green for success */
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(-50px);
+    transition: all 0.5s ease;
+    z-index: 10000;
+    font-weight: 600;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Optional: different color for error */
+.toast.error {
+    background-color: #ef4444;
+}
+
     </style>
 </head>
 <body>
@@ -949,12 +976,26 @@ if (isset($_GET['logout'])) {
 </span>
         </div>
 
+<!-- notification report  -->
+
+
 
     </nav>
 </header>
 
     <!-- Main Content -->
     <main class="container">
+
+    <?php 
+// Show session notification as toast if exists
+if (!empty($_SESSION['notification'])): ?>
+    <div id="toast" class="toast success"><?= $_SESSION['notification'] ?></div>
+    <?php unset($_SESSION['notification']); ?>
+<?php endif; ?>
+
+<?php if (!empty($error)): ?>
+    <div id="toast" class="toast error"><?= $error ?></div>
+<?php endif; ?>
         <!-- About Section - First Thing Users See -->
         <section class="about-section">
             <div class="about-content">
@@ -1656,6 +1697,19 @@ if (isset($_GET['logout'])) {
 
     <script>
         // Smooth animations and interactions
+window.addEventListener('DOMContentLoaded', () => {
+    const toast = document.getElementById('toast');
+    if(toast) {
+        toast.classList.add('show'); // slide in
+
+        // Hide after 4 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+});
+
+
         function toggleNotifications() {
             const panel = document.getElementById('notificationPanel');
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';

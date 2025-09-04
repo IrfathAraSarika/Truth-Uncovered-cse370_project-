@@ -64,9 +64,11 @@ function createReport($conn, $data, $files) {
 // Handle form submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (createReport($conn, $_POST, $_FILES)) {
-        $_SESSION['notification'] = "✅ Thank you for your submission. Your report has been received and is under review. You will be updated soon.";
+      $_SESSION['notification'] = "✅ Report submitted successfully!";
+        $_POST = [];
+        $_FILES = [];
         // Redirect if needed
-        // header("Location: index.php");
+         header("Location: index.php");
         exit();
     } else {
         $error = "❌ Could not create report. Try again.";
@@ -147,6 +149,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border-radius: 8px;
     }
     .error { background: rgba(239,68,68,0.2); color: #fecaca; }
+
+ 
+
   </style>
 </head>
 <body>
@@ -154,16 +159,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h1>Submit a Report</h1>
 
- <?php 
-// Show notification if exists
-if (!empty($_SESSION['notification'])): ?>
-    <div class="message success"><?= $_SESSION['notification'] ?></div>
-    <?php unset($_SESSION['notification']); // remove it after showing ?>
-<?php endif; ?>
 
-<?php if (!empty($error)): ?>
-    <div class="message error"><?= $error ?></div>
-<?php endif; ?>
+
 
     <form method="POST" enctype="multipart/form-data">
       <div class="form-group">
@@ -208,3 +205,5 @@ if (!empty($_SESSION['notification'])): ?>
   </div>
 </body>
 </html>
+
+
