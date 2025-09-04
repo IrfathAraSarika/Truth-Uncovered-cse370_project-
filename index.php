@@ -598,6 +598,7 @@ if (isset($_GET['logout'])) {
             margin: 2rem 0;
             position: relative;
             overflow: hidden;
+            cursor:pointer;
         }
 
         .security-banner::before {
@@ -1054,13 +1055,13 @@ if (!empty($_SESSION['notification'])): ?>
         </section>
 
         <!-- Security Banner -->
-        <div class="security-banner fade-in-delay">
+        <div class="security-banner fade-in-delay"    onclick="window.location.href='categories.php'" >
             <span class="security-icon">🛡️</span>
-            <strong>Your Identity is Protected:</strong> End-to-end encryption • Anonymous reporting • Legal protection guaranteed
+          <strong>Explore All Five Categories</strong>
         </div>
 
         <!-- Quick Categories -->
-        <section class="categories-section" id="categoriesSection">
+        <!-- <section class="categories-section" id="categoriesSection">
             <h2 class="section-title">📋 Report Categories</h2>
             <div class="categories-grid">
                 <div class="category-card" onclick="selectCategory('corruption')">
@@ -1094,7 +1095,7 @@ if (!empty($_SESSION['notification'])): ?>
                     <div class="category-count">28 active cases</div>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- Dashboard Widgets -->
         <div class="dashboard-grid fade-in-delay">

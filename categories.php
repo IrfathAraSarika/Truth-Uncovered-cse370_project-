@@ -1,31 +1,22 @@
     <?php
-    include 'DBconnect.php';
+  session_start();
+include 'DBconnect.php';
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
-    function getCategories($conn) {
-        $query = "SELECT id, name FROM category";
-        $result = mysqli_query($conn, $query);
-        $categories = [];
-        
-        if ($result) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $categories[] = $row;
-            }
-        }
-        return $categories;
-    }
+// ✅ Handle category selection on the same page
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'], $_POST['category_name'])) {
+    $_SESSION['category_id'] = $_POST['category_id'];
+    $_SESSION['category_name'] = $_POST['category_name'];
 
-    function getCategoryStats($conn, $categoryName) {
-        $query = "SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status = 'under_review' THEN 1 ELSE 0 END) as under_review,
-                    SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved
-                  FROM reports 
-                  WHERE category_name = '$categoryName'";
-        $result = mysqli_query($conn, $query);
-        return mysqli_fetch_assoc($result);
-    }
-    
-    ?>
+    // Redirect to categories.php after storing
+    header("Location: case.php");
+    exit();
+}
+  
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -425,7 +416,7 @@
     <!-- Main Container -->
     <div class="container">
         <!-- Header Section -->
-        <div class="header">
+        <div class="header"    onclick="window.location.href='index.php'" >
             <div class="logo-icon"></div>
             <h1 class="main-title">TRUTH UNCOVERED</h1>
             <p class="subtitle">Fighting Crime Through Community Investigation</p>
@@ -467,14 +458,13 @@
                     </p>
                 </div>
 
-                <button class="explore-btn">Explore Corruption Cases</button>
+            <form method="post" style="display:inline;">
+                <input type="hidden" name="category_id" value="1">
+                <input type="hidden" name="category_name" value="Corruption">
+                <button type="submit" class="explore-btn">Explore Corruption Cases </button>
+            </form>
 
-                <div class="interactive-overlay">
-                    <div class="overlay-content">
-                        <h3 class="overlay-title">Fight Corruption</h3>
-                        <p class="overlay-text">Report • Investigate • Transform</p>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Antisocial Category -->
@@ -507,14 +497,19 @@
                     </p>
                 </div>
 
-                <button class="explore-btn">Explore Antisocial Cases</button>
+<form method="post" style="display:inline;">
+    <input type="hidden" name="category_id" value="2">
+    <input type="hidden" name="category_name" value="Antisocial Behavior">
+    <button type="submit" class="explore-btn">Explore Antisocial Cases</button>
+</form>
 
-                <div class="interactive-overlay">
+
+                <!-- <div class="interactive-overlay">
                     <div class="overlay-content">
                         <h3 class="overlay-title">Restore Order</h3>
                         <p class="overlay-text">Document • Address • Heal</p>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Hazard Category -->
@@ -547,14 +542,15 @@
                     </p>
                 </div>
 
-                <button class="explore-btn">Explore Hazard Cases</button>
+                            <form method="post" style="display:inline;">
+    <input type="hidden" name="category_id" value="3">
+    <input type="hidden" name="category_name" value="Public Hazards">
+    <button type="submit" class="explore-btn">Explore Hazard Cases</button>
+</form>
+                   
 
-                <div class="interactive-overlay">
-                    <div class="overlay-content">
-                        <h3 class="overlay-title">Ensure Safety</h3>
-                        <p class="overlay-text">Identify • Report • Secure</p>
-                    </div>
-                </div>
+
+
             </div>
 
             <!-- Harassment Category -->
@@ -587,14 +583,14 @@
                     </p>
                 </div>
 
-                <button class="explore-btn">Explore Harassment Cases</button>
+                
+                <form method="post" style="display:inline;">
+    <input type="hidden" name="category_id" value="4">
+    <input type="hidden" name="category_name" value="Harassment">
+    <button type="submit" class="explore-btn">Explore Harassment Cases</button>
+</form>
 
-                <div class="interactive-overlay">
-                    <div class="overlay-content">
-                        <h3 class="overlay-title">Protect Dignity</h3>
-                        <p class="overlay-text">Support • Justice • Prevention</p>
-                    </div>
-                </div>
+              
             </div>
 
             <!-- Dowry Category -->
@@ -627,14 +623,16 @@
                     </p>
                 </div>
 
-                <button class="explore-btn">Explore Dowry Cases</button>
 
-                <div class="interactive-overlay">
-                    <div class="overlay-content">
-                        <h3 class="overlay-title">End Dowry</h3>
-                        <p class="overlay-text">Educate • Protect • Reform</p>
-                    </div>
-                </div>
+            <form method="post" style="display:inline;">
+    <input type="hidden" name="category_id" value="5">
+    <input type="hidden" name="category_name" value="Dowry Violence">
+    <button type="submit" class="explore-btn">Explore Dowry Cases</button>
+</form>
+
+
+
+
             </div>
         </div>
     </div>

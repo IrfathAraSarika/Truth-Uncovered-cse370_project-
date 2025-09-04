@@ -7,9 +7,24 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 
-// ✅ Fetch all cases (no Created_At, so order by Case_ID)
-$result = $conn->query("SELECT Title, Description, Date_Submitted FROM reports");
-$cases = $result->fetch_all(MYSQLI_ASSOC);
+// ✅ Make sure category is selected
+if (isset($_SESSION['category_id'])) {
+    $category_id = (int) $_SESSION['category_id']; // safe cast to int
+
+    // Fetch reports only for this category
+    $stmt = $conn->prepare("SELECT Title, Description, Date_Submitted 
+                            FROM reports 
+                            WHERE Category_ID = ?");
+    $stmt->bind_param("i", $category_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $cases = $result->fetch_all(MYSQLI_ASSOC);
+
+    $stmt->close();
+} else {
+    // No category in session, maybe fetch nothing or all reports
+    $cases = [];
+}
 
 ?>
 <!DOCTYPE html>
@@ -100,7 +115,12 @@ $cases = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 <body>
 <div class="container">
-  <h1>Case Management</h1>
+<h1>
+    Case Management 
+    <?php if (isset($_SESSION['category_name'])): ?>
+        - <?= htmlspecialchars($_SESSION['category_name']) ?>
+    <?php endif; ?>
+</h1>
 
   <?php if (!empty($_SESSION['notification'])): ?>
     <div class="message success"><?= $_SESSION['notification'] ?></div>
@@ -108,7 +128,7 @@ $cases = $result->fetch_all(MYSQLI_ASSOC);
   <?php endif; ?>
 
   <!-- Create Case -->
-  <div class="card">
+  <!-- <div class="card">
     <h2>Create New Case</h2>
     <form method="POST">
       <input type="hidden" name="create_case" value="1">
@@ -174,10 +194,10 @@ $cases = $result->fetch_all(MYSQLI_ASSOC);
 
       <button type="submit">Create Case</button>
     </form>
-  </div>
+  </div> -->
 
   <!-- List Cases -->
-     <h2 class="title">Existing Cases</h2>
+     <!-- <h2 class="title">Existing Cases</h2> -->
 <div class="case-list"> 
   
     <?php foreach ($cases as $case): ?>
