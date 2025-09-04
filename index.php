@@ -1227,59 +1227,11 @@ if (!empty($_SESSION['notification'])): ?>
             </div>
 
             <!-- Case Status Timeline -->
-            <div class="glass-widget">
-                <h3 class="widget-title">⏱️ Case Status Timeline</h3>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-title">Report Submitted</div>
-                        <div class="timeline-date">Aug 25, 2025 - 10:30 AM</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-title">Initial Review Completed</div>
-                        <div class="timeline-date">Aug 26, 2025 - 2:15 PM</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-title">Under Investigation</div>
-                        <div class="timeline-date">Aug 27, 2025 - 9:00 AM</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-title">Action Being Taken</div>
-                        <div class="timeline-date">In Progress</div>
-                    </div>
-                </div>
-            </div>
+        
 
-            <!-- Evidence Upload -->
-            <div class="glass-widget">
-                <h3 class="widget-title">📎 Upload Evidence</h3>
-                <div class="upload-zone" onclick="triggerUpload()">
-                    <div class="upload-icon">📁</div>
-                    <div class="upload-text">Drop files here or click to upload</div>
-                    <div class="upload-subtext">
-                        Supports: Images (JPG, PNG), Videos (MP4), Documents (PDF, DOC)<br>
-                        Max size: 50MB per file
-                    </div>
-                </div>
-                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; font-size: 0.9rem; color: #cbd5e1;">
-                    ✅ All uploads are encrypted and anonymous<br>
-                    ✅ Metadata automatically stripped for privacy<br>
-                    ✅ Secure cloud storage with legal protection
-                </div>
-            </div>
+      
 
-            <!-- Quick Submit -->
-            <div class="glass-widget">
-                <h3 class="widget-title">🚨 Quick Report Submission</h3>
-                <p style="color: #cbd5e1; margin-bottom: 1.5rem; font-size: 0.95rem;">
-                    Found something that needs immediate attention? Submit a quick report now.
-                </p>
-                <button class="action-button primary-button" onclick="showReportModal()">
-                    📝 Submit New Report
-                </button>
-                <button class="action-button" onclick="showEmergencyModal()" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 0.5rem;">
-                    🚨 Emergency Report
-                </button>
-            </div>
+        
         </div>
 
         <!-- Impact Stories Section -->
