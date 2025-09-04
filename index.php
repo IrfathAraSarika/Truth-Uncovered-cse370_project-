@@ -1187,7 +1187,7 @@ if (!empty($_SESSION['notification'])): ?>
                     </div>
                     <div class="trust-score">5.8/10</div>
                 </div>
-                <button class="action-button">View Full Rankings</button>
+                <button class="action-button"   onclick="window.location.href='institutionranking.php'" >View Full Rankings</button>
             </div>
 
             <!-- Case Status Timeline -->
