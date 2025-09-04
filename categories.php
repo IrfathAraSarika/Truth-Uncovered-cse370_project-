@@ -1,221 +1,770 @@
+    <?php
+    include 'DBconnect.php';
 
-<?php
-session_start();
-
-include 'DBconnect.php';
-
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-mysqli_report(MYSQLI_REPORT_OFF);
-
-// Function to escape special characters for safety
-function h($v) {
-    return htmlspecialchars($v ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-}
-
-// Category defaults (for label lookup)
-$defaults = [
-    'corruption' => 'Corruption & Bribery',
-    'harassment' => 'Harassment & Abuse',
-    'infrastructure' => 'Infrastructure Issues',
-    'education' => 'Education System',
-    'healthcare' => 'Healthcare',
-    'environment' => 'Environmental Issues',
-    'success-story' => 'Success Story',
-    'awareness' => 'Public Awareness',
-    'other' => 'Other',
-];
-
-// Image map keyed by category slug (DB doesn't store image URLs)
-$imageMap = [
-    'corruption' => 'https://example.com/images/corruption.jpg',
-    'harassment' => 'https://example.com/images/harassment.jpg',
-    'infrastructure' => 'https://example.com/images/infrastructure.jpg',
-    'education' => 'https://example.com/images/education.jpg',
-    'healthcare' => 'https://example.com/images/healthcare.jpg',
-    'environment' => 'https://example.com/images/environment.jpg',
-    'success-story' => 'https://example.com/images/success_story.jpg',
-    'awareness' => 'https://example.com/images/awareness.jpg',
-    'other' => 'https://example.com/images/other.jpg',
-];
-
-// Placeholder image if category image not found
-$placeholderImg = 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop';
-
-// Load categories from DB (id, slug, name)
-$categories = [];
-$res = $conn->query("SELECT id, slug, name FROM categories ORDER BY name");
-
-if ($res) {
-    while ($row = $res->fetch_assoc()) {
-        $slug = (string)$row['slug'];
-        $categories[$slug] = [
-            'id' => (int)$row['id'],
-            'slug' => $slug,
-            'label' => (string)$row['name'],
-            'image' => $imageMap[$slug] ?? $placeholderImg,
-        ];
+    function getCategories($conn) {
+        $query = "SELECT id, name FROM category";
+        $result = mysqli_query($conn, $query);
+        $categories = [];
+        
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $categories[] = $row;
+            }
+        }
+        return $categories;
     }
-}
 
-// Fallback if table is empty (default categories)
-if (empty($categories)) {
-    foreach ($defaults as $slug => $label) {
-        $categories[$slug] = [
-            'id' => null,
-            'slug' => $slug,
-            'label' => $label,
-            'image' => $imageMap[$slug] ?? $placeholderImg,
-        ];
+    function getCategoryStats($conn, $categoryName) {
+        $query = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'under_review' THEN 1 ELSE 0 END) as under_review,
+                    SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved
+                  FROM reports 
+                  WHERE category_name = '$categoryName'";
+        $result = mysqli_query($conn, $query);
+        return mysqli_fetch_assoc($result);
     }
-}
-
-// Get selected category from URL query string
-$selected = trim($_GET['category'] ?? '');
-$selectedInfo = $selected && isset($categories[$selected]) ? $categories[$selected] : null;
-
-// Fetch blogposts for the selected category
-$blogposts = [];
-if ($selectedInfo) {
-    $stmt = $conn->prepare("SELECT Post_ID, Title, Content, Author_ID, Date_Published, Published_At, Status FROM blogposts WHERE Category = ? AND Status = 'published' ORDER BY Published_At DESC");
-    $stmt->bind_param('s', $selected);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
-        $blogposts[] = $row;
-    }
-    $stmt->close();
-}
-?>
+    
+    ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Categories - Truth Uncovered</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth Uncovered - Crime Categories</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; color: #e5e7eb; background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1e3a8a 100%); min-height: 100vh; overflow-x: hidden; }
-        .bg-animation { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
-        .floating-orb { position: absolute; border-radius: 50%; background: linear-gradient(45deg, rgba(59,130,246,.1), rgba(147,51,234,.1)); animation: float 6s ease-in-out infinite; }
-        .orb1 { width: 300px; height: 300px; top: 10%; left: 80%; animation-delay: 0s; }
-        .orb2 { width: 200px; height: 200px; top: 70%; left: 10%; animation-delay: 2s; }
-        .orb3 { width: 150px; height: 150px; top: 30%; left: 20%; animation-delay: 4s; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
-        header { background: rgba(255,255,255,.05); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,.1); position: sticky; top: 0; z-index: 100; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.2rem; }
-        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 1.2rem; }
-        .glass { background: rgba(255,255,255,.1); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,.15); border-radius: 16px; padding: 1.4rem; margin: 1.2rem 0; color: #e2e8f0; }
-        .title { color: #fff; font-weight: 800; font-size: 1.4rem; margin-bottom: .3rem; }
-        .muted { color: #94a3b8; font-size: .95rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
-        .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; overflow: hidden; cursor: pointer; transition: .25s transform ease, .25s box-shadow ease; }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,.25); }
-        .img { width: 100%; height: 140px; object-fit: cover; display: block; }
-        .label { padding: .9rem 1rem; text-align: center; font-weight: 700; color: #93c5fd; }
-        .selector { display: flex; gap: .6rem; flex-wrap: wrap; margin: .8rem 0; }
-        .input, .select { width: 100%; padding: .8rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1); color: #fff; outline: none; }
-        .primary-btn { padding: .8rem 1.1rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; }
-        .link-btn { padding: .8rem 1.1rem; background: rgba(255,255,255,.12); color: #fff; border-radius: 12px; text-decoration: none; display: inline-block; }
-        .highlight { padding: 1rem; border-left: 4px solid #3b82f6; background: rgba(59,130,246,.12); border-radius: 10px; }
-        .blog-list { margin-top: 2rem; }
-        .blog-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(59,130,246,0.13); border-radius: 12px; margin-bottom: 1.2rem; padding: 1.2rem 1.2rem 1rem 1.2rem; }
-        .blog-title { color: #38bdf8; font-size: 1.15rem; font-weight: 700; margin-bottom: .5rem; }
-        .blog-meta { color: #a5b4fc; font-size: .93rem; margin-bottom: .7rem; }
-        .blog-content { color: #e0e7ef; font-size: 1rem; line-height: 1.7; }
-        .no-posts { color: #fca5a5; background: rgba(239,68,68,0.08); border-radius: 8px; padding: 1rem; margin-top: 1.5rem; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1e3a8a 100%);
+            position: relative;
+            overflow-x: hidden;
+            color: #ffffff;
+        }
+
+        /* Background Image Layer */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1920&q=80') center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* Animated Background Orbs */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2));
+            filter: blur(1px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb1 { 
+            width: 400px; 
+            height: 400px; 
+            top: -10%; 
+            left: 80%; 
+            animation-delay: 0s;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3), transparent);
+        }
+        
+        .orb2 { 
+            width: 300px; 
+            height: 300px; 
+            top: 70%; 
+            left: -15%; 
+            animation-delay: 3s;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.3), transparent);
+        }
+        
+        .orb3 { 
+            width: 250px; 
+            height: 250px; 
+            top: 30%; 
+            left: 20%; 
+            animation-delay: 5s;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.2), transparent);
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg) scale(1); 
+            }
+            33% { 
+                transform: translate(30px, -30px) rotate(120deg) scale(1.1); 
+            }
+            66% { 
+                transform: translate(-20px, 20px) rotate(240deg) scale(0.9); 
+            }
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-icon::after {
+            content: '🔍';
+            font-size: 40px;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .mission-statement {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Categories Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .category-card:nth-child(2) .category-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .category-card:nth-child(3) .category-icon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .category-card:nth-child(4) .category-icon {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+        }
+
+        .category-card:nth-child(5) .category-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .category-description {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vision-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .vision-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vision-text {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .explore-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .explore-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Interactive Features */
+        .interactive-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(139, 92, 246, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .category-card:hover .interactive-overlay {
+            opacity: 1;
+        }
+
+        .overlay-content {
+            text-align: center;
+            color: white;
+        }
+
+        .overlay-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .overlay-text {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .category-card {
+                padding: 25px;
+            }
+
+            .container {
+                padding: 30px 15px;
+            }
+        }
     </style>
 </head>
 <body>
-<div class="bg-animation">
-    <div class="floating-orb orb1"></div>
-    <div class="floating-orb orb2"></div>
-    <div class="floating-orb orb3"></div>
-</div>
-<header>
-    <nav class="container">
-        <div class="logo">TRUTH UNCOVERED</div>
-        <div style="color:#cbd5e1;font-size:.95rem;">
-            <?php if (isset($_SESSION['username'])): ?>
-                Welcome, <strong style="color:#fff;"><?= h($_SESSION['username']) ?></strong>
-            <?php elseif (isset($_SESSION['email'])): ?>
-                Logged in as <strong style="color:#fff;"><?= h($_SESSION['email']) ?></strong>
-            <?php else: ?>
-                <a href="login.php" style="color:#93c5fd;text-decoration:none;">Login</a>
-            <?php endif; ?>
-            &nbsp;|&nbsp; <a href="index.php" style="color:#a78bfa;text-decoration:none;">Dashboard</a>
-            &nbsp;|&nbsp; <a href="report_submission.php" style="color:#93c5fd;text-decoration:none;">Submit Report</a>
-            &nbsp;|&nbsp; <a href="blogposts.php" style="color:#93c5fd;text-decoration:none;">Write Blog</a>
+    <!-- Background Image Layer -->
+    <div class="background-image"></div>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-orb orb1"></div>
+        <div class="floating-orb orb2"></div>
+        <div class="floating-orb orb3"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="logo-icon"></div>
+            <h1 class="main-title">TRUTH UNCOVERED</h1>
+            <p class="subtitle">Fighting Crime Through Community Investigation</p>
+            
+            <div class="mission-statement">
+                <strong>Our Mission:</strong> Truth Uncovered is Bangladesh's premier digital platform dedicated to combating crime through community-driven investigation and transparent reporting. We empower citizens to report, track, and collectively address the most pressing criminal activities affecting our society. Together, we build a safer Bangladesh through the power of truth and transparency.
+            </div>
         </div>
-    </nav>
-</header>
 
-<main class="container">
-    <section class="glass">
-        <div class="title">📚 Browse Categories</div>
-        <p class="muted">Choose a category to explore related reports and posts.</p>
-
-        <form class="selector" method="get" action="">
-            <select name="category" class="select" required>
-                <option value="">Select a category</option>
-                <?php foreach ($categories as $slug => $cat): ?>
-                    <option value="<?= h($slug) ?>" <?= $selected === $slug ? 'selected' : '' ?>><?= h($cat['label']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <button type="submit" class="primary-btn">Explore</button>
-            <a class="link-btn" href="<?= h($_SERVER['PHP_SELF']) ?>">Reset</a>
-        </form>
-
-        <?php if ($selectedInfo): ?>
-            <div class="glass" style="margin:.8rem 0;">
-                <div class="title" style="font-size:1.1rem;"><?= h($selectedInfo['label']) ?></div>
-                <div class="highlight" style="margin-top:.6rem;">
-                    Explore all reports and blogs related to <strong><?= h($selectedInfo['label']) ?></strong>.
+        <!-- Categories Grid -->
+        <div class="categories-grid">
+            <!-- Corruption Category -->
+            <div class="category-card" onclick="exploreCategory('corruption')">
+                <div class="category-icon">🏛️</div>
+                <h2 class="category-title">Corruption</h2>
+                <p class="category-description">
+                    Corruption remains one of Bangladesh's most pervasive challenges, affecting everything from government services to business operations. Our platform tracks bribery, embezzlement, nepotism, and misuse of public resources.
+                </p>
+                
+                <div class="category-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">2,847</div>
+                        <div class="stat-label">Reports Filed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1,203</div>
+                        <div class="stat-label">Under Review</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">845</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
                 </div>
-                <img src="<?= h($selectedInfo['image']) ?>" alt="<?= h($selectedInfo['label']) ?>" style="width:100%;border-radius:12px;margin-top:12px;"/>
-                <div style="margin-top:.8rem;display:flex;gap:.6rem;flex-wrap:wrap;">
-                    <a class="primary-btn" href="report_submission.php?prefill_category=<?= h($selectedInfo['slug']) ?>">Submit a Report</a>
-                    <a class="link-btn" href="category_posts.php?category=<?= h($selectedInfo['slug']) ?>">View Posts</a>
+
+                <div class="vision-section">
+                    <h3 class="vision-title">Our Vision</h3>
+                    <p class="vision-text">
+                        Create a corruption-free Bangladesh by establishing transparent reporting mechanisms, supporting whistleblowers, and ensuring accountability at all levels of governance and business.
+                    </p>
+                </div>
+
+                <button class="explore-btn">Explore Corruption Cases</button>
+
+                <div class="interactive-overlay">
+                    <div class="overlay-content">
+                        <h3 class="overlay-title">Fight Corruption</h3>
+                        <p class="overlay-text">Report • Investigate • Transform</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="blog-list">
-                <div class="title" style="font-size:1.1rem;margin-bottom:.7rem;">📝 Blog Posts in "<?= h($selectedInfo['label']) ?>"</div>
-                <?php if (count($blogposts) > 0): ?>
-                    <?php foreach ($blogposts as $post): ?>
-                        <div class="blog-card">
-                            <div class="blog-title"><?= h($post['Title']) ?></div>
-                            <div class="blog-meta">
-                                Published: <?= date('F j, Y', strtotime($post['Published_At'])) ?>
-                                <?php if (!empty($post['Author_ID'])): ?>
-                                    | Author ID: <?= (int)$post['Author_ID'] ?>
-                                <?php endif; ?>
-                                | Status: <?= h(ucfirst($post['Status'])) ?>
-                            </div>
-                            <div class="blog-content"><?= nl2br(h(mb_strimwidth($post['Content'], 0, 400, '...'))) ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="no-posts">No blog posts found in this category.</div>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="grid">
-            <?php foreach ($categories as $slug => $cat): ?>
-                <div class="card" onclick="window.location='?category=<?= h($slug) ?>'">
-                    <img class="img" src="<?= h($cat['image']) ?>" alt="<?= h($cat['label']) ?>">
-                    <div class="label"><?= h($cat['label']) ?></div>
+            <!-- Antisocial Category -->
+            <div class="category-card" onclick="exploreCategory('antisocial')">
+                <div class="category-icon">⚠️</div>
+                <h2 class="category-title">Antisocial Behavior</h2>
+                <p class="category-description">
+                    From street harassment to public disorder, antisocial behaviors disrupt community harmony. We document incidents of public nuisance, vandalism, drug abuse, and activities that threaten social cohesion.
+                </p>
+                
+                <div class="category-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1,956</div>
+                        <div class="stat-label">Reports Filed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">723</div>
+                        <div class="stat-label">Under Review</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1,089</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
                 </div>
-            <?php endforeach; ?>
+
+                <div class="vision-section">
+                    <h3 class="vision-title">Our Vision</h3>
+                    <p class="vision-text">
+                        Build stronger communities by addressing antisocial behaviors through community engagement, education, and coordinated response with local authorities and social organizations.
+                    </p>
+                </div>
+
+                <button class="explore-btn">Explore Antisocial Cases</button>
+
+                <div class="interactive-overlay">
+                    <div class="overlay-content">
+                        <h3 class="overlay-title">Restore Order</h3>
+                        <p class="overlay-text">Document • Address • Heal</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hazard Category -->
+            <div class="category-card" onclick="exploreCategory('hazard')">
+                <div class="category-icon">🚨</div>
+                <h2 class="category-title">Public Hazards</h2>
+                <p class="category-description">
+                    Safety hazards in public spaces, workplaces, and infrastructure pose serious risks to citizens. We track unsafe buildings, environmental hazards, traffic violations, and industrial safety breaches.
+                </p>
+                
+                <div class="category-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">3,421</div>
+                        <div class="stat-label">Reports Filed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1,567</div>
+                        <div class="stat-label">Under Review</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1,654</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+
+                <div class="vision-section">
+                    <h3 class="vision-title">Our Vision</h3>
+                    <p class="vision-text">
+                        Ensure public safety by identifying and addressing hazardous conditions before they cause harm, working with authorities to implement proper safety measures and regulations.
+                    </p>
+                </div>
+
+                <button class="explore-btn">Explore Hazard Cases</button>
+
+                <div class="interactive-overlay">
+                    <div class="overlay-content">
+                        <h3 class="overlay-title">Ensure Safety</h3>
+                        <p class="overlay-text">Identify • Report • Secure</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Harassment Category -->
+            <div class="category-card" onclick="exploreCategory('harassment')">
+                <div class="category-icon">🛡️</div>
+                <h2 class="category-title">Harassment</h2>
+                <p class="category-description">
+                    Harassment in all its forms - workplace, sexual, cyber, or psychological - undermines human dignity. We provide a safe platform for reporting and addressing harassment incidents across Bangladesh.
+                </p>
+                
+                <div class="category-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1,634</div>
+                        <div class="stat-label">Reports Filed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">892</div>
+                        <div class="stat-label">Under Review</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">542</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+
+                <div class="vision-section">
+                    <h3 class="vision-title">Our Vision</h3>
+                    <p class="vision-text">
+                        Create a harassment-free society where everyone can live and work with dignity, providing support to victims and ensuring perpetrators are held accountable.
+                    </p>
+                </div>
+
+                <button class="explore-btn">Explore Harassment Cases</button>
+
+                <div class="interactive-overlay">
+                    <div class="overlay-content">
+                        <h3 class="overlay-title">Protect Dignity</h3>
+                        <p class="overlay-text">Support • Justice • Prevention</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dowry Category -->
+            <div class="category-card" onclick="exploreCategory('dowry')">
+                <div class="category-icon">💔</div>
+                <h2 class="category-title">Dowry Violence</h2>
+                <p class="category-description">
+                    Despite legal prohibitions, dowry-related violence continues to harm families across Bangladesh. We track dowry demands, related violence, and work to support victims while pursuing justice.
+                </p>
+                
+                <div class="category-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">896</div>
+                        <div class="stat-label">Reports Filed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">445</div>
+                        <div class="stat-label">Under Review</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">312</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+
+                <div class="vision-section">
+                    <h3 class="vision-title">Our Vision</h3>
+                    <p class="vision-text">
+                        Eliminate dowry practices through education, legal action, and social awareness campaigns, ensuring every marriage is based on mutual respect rather than financial transactions.
+                    </p>
+                </div>
+
+                <button class="explore-btn">Explore Dowry Cases</button>
+
+                <div class="interactive-overlay">
+                    <div class="overlay-content">
+                        <h3 class="overlay-title">End Dowry</h3>
+                        <p class="overlay-text">Educate • Protect • Reform</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
-</main>
+    </div>
+
+    <script>
+        // Interactive category exploration
+        function exploreCategory(categoryType) {
+            console.log(`Exploring ${categoryType} category`);
+            
+            // Add visual feedback
+            const cards = document.querySelectorAll('.category-card');
+            cards.forEach(card => {
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Simulate navigation to category details page
+            setTimeout(() => {
+                alert(`Loading ${categoryType} investigation dashboard...`);
+                // In real implementation: window.location.href = `category-details.php?type=${categoryType}`;
+            }, 500);
+        }
+
+        // Interactive animations
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Simulate real-time updates to statistics
+        function updateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
+                const increment = Math.floor(Math.random() * 5);
+                if (increment > 0) {
+                    const newValue = currentValue + increment;
+                    stat.textContent = newValue.toLocaleString();
+                    stat.style.color = '#22c55e';
+                    setTimeout(() => {
+                        stat.style.color = '#3b82f6';
+                    }, 2000);
+                }
+            });
+        }
+
+        // Update stats every 30 seconds
+        setInterval(updateStats, 30000);
+
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Add particle effect for interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.explore-btn') || e.target.closest('.category-card')) {
+                createParticles(e.clientX, e.clientY);
+            }
+        });
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 9999;
+                    left: ${x}px;
+                    top: ${y}px;
+                `;
+                document.body.appendChild(particle);
+
+                const angle = (Math.PI * 2 * i) / 8;
+                const velocity = 2 + Math.random() * 2;
+                const lifetime = 800;
+                const startTime = Date.now();
+
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = elapsed / lifetime;
+
+                    if (progress < 1) {
+                        const distance = velocity * elapsed;
+                        const currentX = x + Math.cos(angle) * distance;
+                        const currentY = y + Math.sin(angle) * distance - (progress * 40);
+                        
+                        particle.style.left = currentX + 'px';
+                        particle.style.top = currentY + 'px';
+                        particle.style.opacity = 1 - progress;
+                        
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+        }
+    </script>
+
+
 </body>
-
+</html>

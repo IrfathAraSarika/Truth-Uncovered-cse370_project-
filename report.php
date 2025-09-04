@@ -15,7 +15,7 @@ function createReport($pdo, $data, $files) {
         $data['description'],
         $data['longitude'],
         $data['latitude'],
-        $data['address'],          // ✅ now maps to Incident_Address
+        $data['address'],          
         $data['incident_date'],
         $data['incident_time'],
         $data['category'],

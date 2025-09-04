@@ -305,6 +305,10 @@ if (isset($_GET['logout'])) {
             box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
             background: linear-gradient(135deg, #2563eb, #7c3aed);
         }
+        .button-width{
+            text-align:center;
+            width: 50%;
+        }
 
         /* Glass Cards Section */
         .dashboard-grid {
@@ -897,6 +901,12 @@ if (isset($_GET['logout'])) {
     color: #e63946; /* red on hover */
     transform: scale(1.15);
 }
+.button-container {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
     </style>
 </head>
 <body>
@@ -976,26 +986,29 @@ if (isset($_GET['logout'])) {
                         <div class="feature-desc">89% resolution rate with measurable outcomes</div>
                     </div>
                 </div>
-                
-           <button class="explore-button" 
+              
+     <div class="button-container">
+        
+           <button class="explore-button button-width" 
         title="Go to the blog creation page" 
         onclick="window.location.href='blogposts.php'" 
-        style="display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #fff; cursor: pointer;">
+        style="display: flex; align-items: center; justify-content:center; gap: 0.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #fff; cursor: pointer;">
     <!-- SVG icon: pencil/edit for creating a post -->
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
     Start Writing Your Blog
 </button>
-<button class="explore-button" 
+<button class="explore-button button-width" 
                 title="Go to the report submission page" 
                 onclick="window.location.href='report.php'" 
-                style="display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; cursor: pointer;">
+                style="display: flex; align-items: center; justify-content:center; gap: 0.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; cursor: pointer;">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
                 Submit a Report
             </button>
+              </div>   
             </div>
         </section>
 
