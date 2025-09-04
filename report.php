@@ -1,60 +1,81 @@
 <?php
 session_start();
-include 'DBconnect.php';
+include 'DBconnect.php'; 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 
 // Insert Report function
-function createReport($pdo, $data, $files) {
-    $stmt = $pdo->prepare("
-        INSERT INTO reports 
-        (Title, Description, Date_Submitted, Status, Incident_Longitude, Incident_Latitude, Incident_Address, Incident_Date, Incident_Time, Category_ID, User_ID) 
-        VALUES (?, ?, NOW(), 'Draft', ?, ?, ?, ?, ?, ?, ?)
-    ");
+function createReport($conn, $data, $files) {
+    $file_paths = []; // array to store all uploaded file paths
 
-    $success = $stmt->execute([
-        $data['title'],
-        $data['description'],
-        $data['longitude'],
-        $data['latitude'],
-        $data['address'],          
-        $data['incident_date'],
-        $data['incident_time'],
-        $data['category'],
-        $data['user_id']
-    ]);
+    // Handle multiple file uploads
+    if (isset($files['report_file'])) {
+        foreach ($files['report_file']['tmp_name'] as $key => $tmpName) {
+            if ($files['report_file']['error'][$key] === 0) {
+                $uploadDir = "uploads/";
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
-    // Handle evidence uploads
-    if ($success && !empty($files['evidence']['name'][0])) {
-        $reportId = $pdo->lastInsertId();
-        foreach ($files['evidence']['tmp_name'] as $key => $tmpName) {
-            $filename = basename($files['evidence']['name'][$key]);
-            $target = "uploads/" . time() . "_" . $filename;
-            if (move_uploaded_file($tmpName, $target)) {
-                $stmtFile = $pdo->prepare("
-                    INSERT INTO evidence (Report_ID, Type, File_Link) VALUES (?, ?, ?)
-                ");
-                $fileType = mime_content_type($target);
-                $stmtFile->execute([$reportId, $fileType, $target]);
+                $fileName = basename($files['report_file']['name'][$key]);
+                $targetFile = $uploadDir . time() . "_" . $fileName;
+
+                if (move_uploaded_file($tmpName, $targetFile)) {
+                    $file_paths[] = $targetFile; // save path
+                }
             }
         }
     }
 
+    // Convert array of paths to comma-separated string
+    $file_path_str = implode(",", $file_paths);
+
+
+
+    // Insert into reports (added file_path column)
+    $stmt = $conn->prepare("
+        INSERT INTO reports 
+        (Title, Description, Date_Submitted, Status, Incident_Address, Incident_Date, Incident_Time, Category_ID, User_ID, file_path) 
+        VALUES (?, ?, NOW(), 'Draft', ?, ?, ?, ?, ?, ?)
+    ");
+
+    if (!$stmt) die("Prepare failed: " . $conn->error);
+
+    $stmt->bind_param(
+        "sssssiis",
+        $data['title'],
+        $data['description'],
+        $data['address'],
+        $data['incident_date'],
+        $data['incident_time'],
+        $data['category'],
+        $data['user_id'],
+        $file_path_str
+    );
+
+    $success = $stmt->execute();
+    if (!$success) die("Execute failed: " . $stmt->error);
+
+    $stmt->close();
     return $success;
 }
 
 // Handle form submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (createReport($conn, $_POST, $_FILES)) {
-        // Save notification in session
         $_SESSION['notification'] = "✅ Thank you for your submission. Your report has been received and is under review. You will be updated soon.";
-        
-        // Redirect to homepage
-        header("Location: index.php");
+        // Redirect if needed
+        // header("Location: index.php");
         exit();
     } else {
         $error = "❌ Could not create report. Try again.";
     }
 }
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,11 +151,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
   <div class="report-box">
+
     <h1>Submit a Report</h1>
 
-    <?php if (!empty($error)): ?>
-      <div class="message error"><?= $error ?></div>
-    <?php endif; ?>
+ <?php 
+// Show notification if exists
+if (!empty($_SESSION['notification'])): ?>
+    <div class="message success"><?= $_SESSION['notification'] ?></div>
+    <?php unset($_SESSION['notification']); // remove it after showing ?>
+<?php endif; ?>
+
+<?php if (!empty($error)): ?>
+    <div class="message error"><?= $error ?></div>
+<?php endif; ?>
 
     <form method="POST" enctype="multipart/form-data">
       <div class="form-group">
@@ -158,8 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <div class="form-group">
         <label>Incident Location</label>
-        <input type="text" name="longitude" placeholder="Longitude">
-        <input type="text" name="latitude" placeholder="Latitude" style="margin-top:10px;">
+
         <input type="text" name="address" placeholder="Incident Address" style="margin-top:10px;">
       </div>
       <div class="form-group">
@@ -171,8 +199,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="time" name="incident_time" id="incident_time" required>
       </div>
       <div class="form-group">
-        <label for="evidence">Evidence (Photos, Videos, Docs)</label>
-        <input type="file" name="evidence[]" id="evidence" multiple>
+        <label for="report_file">Evidence (Photos, Videos, Docs)</label>
+        <input type="file" name="report_file[]" id="report_file" multiple>
       </div>
       <input type="hidden" name="user_id" value="1"><!-- Replace with session user ID -->
       <button type="submit">Submit Report</button>
