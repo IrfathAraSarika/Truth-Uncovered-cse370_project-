@@ -76,27 +76,22 @@ if ($input) {
 }
 
 
-// Get JSON input
-$input = json_decode(file_get_contents('php://input'), true);
+// User delete action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteUserId'])) {
+    session_start(); // make sure session is started
+    $userId = intval($_POST['deleteUserId']); // sanitize input
 
-// Handle account deletion
-if ($input && isset($input['action']) && $input['action'] === 'delete_account') {
-    if (isset($input['user_id'])) {
-        $user_id = intval($input['user_id']); // sanitize user_id
+    $sql = "DELETE FROM Users WHERE User_ID = ? LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $userId);
 
-        $stmt = $conn->prepare("DELETE FROM Users WHERE User_ID = ?");
-        $stmt->bind_param("i", $user_id);
-
-        if ($stmt->execute()) {
-            session_destroy(); // logout user
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'message' => $stmt->error]);
-        }
+    if ($stmt->execute()) {
+        session_destroy(); 
+        echo json_encode(['success' => true]); 
     } else {
-        echo json_encode(['success' => false, 'message' => 'User ID not provided']);
+        echo json_encode(['success' => false, 'message' => $stmt->error]);
     }
-    exit(); // Stop further HTML output for AJAX
+    exit; // stop any further output
 }
 
 //Change password action api 
@@ -874,7 +869,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </button>
 
               <?php if (isset($_SESSION['role']) && $_SESSION['role'] !== 'Admin'): ?>
-    <button class="action-button danger-button" onclick="deleteAccount()">
+    <button class="action-button danger-button" onclick="deleteAccount(<?php echo $_SESSION['user_id']; ?>)">
         🗑️ Delete Account
     </button>
 <?php endif; ?>
@@ -1181,22 +1176,20 @@ for (let pair of formData.entries()) {
             showNotification('Profile data downloaded successfully!', 'success');
         }
 
-   function deleteAccount() {
-    if (!confirm('Are you sure you want to delete your account? This action cannot be undone?')) return;
-    if (!confirm('This will permanently delete all your data. Are you absolutely sure?')) return;
+   function deleteAccount(user_id) {
 
-    showNotification('Deleting account...', 'warning');
-
+console.log("userID:",user_id)
     // Send request to the same page to delete account
     fetch(window.location.href, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'delete_account' })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'deleteUserId=' + encodeURIComponent(user_id)
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
             // Redirect to signup page after deletion
+               showNotification('Accound Deleted Successfully', 'success');
             window.location.href = 'signup.php';
         } else {
             showNotification('Error deleting account: ' + data.message, 'error');

@@ -165,6 +165,7 @@ if (isset($_GET['logout'])) {
         .user-info {
             text-align: right;
             color: #e2e8f0;
+            cursor:pointer;
         }
 
         .user-name {
