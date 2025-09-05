@@ -6,7 +6,6 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-
 // Insert Report function
 function createReport($conn, $data, $files) {
     $file_paths = []; // array to store all uploaded file paths
@@ -230,7 +229,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="report_file">Evidence (Photos, Videos, Docs)</label>
         <input type="file" name="report_file[]" id="report_file" multiple>
       </div>
-      <input type="hidden" name="user_id" value="1"><!-- Replace with session user ID -->
+<input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
+
       <button type="submit">Submit Report</button>
     </form>
   </div>

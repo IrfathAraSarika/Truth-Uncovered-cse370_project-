@@ -23,6 +23,17 @@ if ($result->num_rows === 1) {
 }
 
 
+// Fetch reports only for the logged-in user
+$sql_report = "SELECT * FROM reports WHERE User_ID = ?";
+$stmt = $conn->prepare($sql_report);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result_report = $stmt->get_result();
+
+$reports = $result_report->fetch_all(MYSQLI_ASSOC);
+
+echo "<script>console.log(" . json_encode($reports) . ");</script>";
+
 // Handle profile update if POST data is sent
 $input = json_decode(file_get_contents('php://input'), true);
 error_log(print_r($input, true));
@@ -148,7 +159,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             min-height: 100vh;
             overflow-x: hidden;
         }
+  .glass-widget {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
 
+        .glass-widget:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .widget-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+          /* Recent Reports Widget */
+        .report-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .report-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(8px);
+        }
+
+        .report-title {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-pending { 
+            background: rgba(251, 191, 36, 0.2); 
+            color: #fbbf24; 
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        .status-verified { 
+            background: rgba(34, 197, 94, 0.2); 
+            color: #22c55e; 
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .status-action-taken { 
+          background: rgba(239, 68, 68, 0.2);
+           color: #ef4444;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
         /* Animated Background */
         .bg-animation {
             position: fixed;
@@ -847,6 +947,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                 </div>
             </div>
+       <!-- recent post secston  -->
+
+  <!-- Recent Reports -->
+        <div class="glass-widget">
+    <h3 class="widget-title">📄 Your Recent Reports</h3>
+
+    <?php if (!empty($reports)): ?>
+        <?php foreach ($reports as $report): ?>
+            <?php 
+                $date = date("M d, Y", strtotime($report['Date_Submitted']));
+
+                // Map status → badge class
+                $status = strtolower($report['Status']);
+                $badgeClass = '';
+                if ($status === 'accepted') {
+                    $badgeClass = 'status-verified';
+                } elseif ($status === 'pending') {
+                    $badgeClass = 'status-pending';
+                } elseif ($status === 'declined') {
+                    $badgeClass = 'status-action-taken';
+                }
+            ?>
+            <div class="report-item">
+                <div class="report-title"><?php echo htmlspecialchars($report['Title']); ?></div>
+                <div class="report-meta">
+                    <span><?php echo $date; ?></span>
+                    <span class="status-badge <?php echo $badgeClass; ?>">
+                        <?php echo htmlspecialchars($report['Status']); ?>
+                    </span>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+       <p style="color:white">No reports submitted yet.</p>
+    <?php endif; ?>
+</div>
+
+
+
+
 
             <!-- Security Banner -->
             <div class="security-banner">
