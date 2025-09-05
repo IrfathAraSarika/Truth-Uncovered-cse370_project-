@@ -21,12 +21,18 @@ if ($result->num_rows === 1) {
     echo "User not found!";
     exit();
 }
-$sub_sms = !empty($user['Sub_SMS']) && $user['Sub_SMS'] != 0;
-$sub_email = !empty($user['Sub_Email']) && $user['Sub_Email'] != 0;
-$sub_blog = !empty($user['Sub_Blog_Following']) && $user['Sub_Blog_Following'] != 0;
+
 
 // Handle profile update if POST data is sent
 $input = json_decode(file_get_contents('php://input'), true);
+error_log(print_r($input, true));
+
+$sub_sms   = !empty($input['smsNotification'])   && $input['smsNotification']   == 1 ? 1 : 0;
+$sub_email = !empty($input['emailNotification']) && $input['emailNotification'] == 1 ? 1 : 0;
+$sub_blog  = !empty($input['blogNotifation'])    && $input['blogNotifation']    == 1 ? 1 : 0;
+
+
+
 if ($input) {
     $sql = "UPDATE Users SET 
         Name = ?, 
@@ -37,12 +43,15 @@ if ($input) {
         Street = ?, 
         City = ?, 
         Region = ?, 
-        Postal_Code = ?
+        Postal_Code = ?,
+        Sub_Email = ?,
+        Sub_SMS = ?,
+        Sub_Blog_Following = ?
         WHERE User_ID = ?";
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "sssssssssi",
+      "ssssssssssiii",
         $input['name'],
         $input['email'],
         $input['phone'],
@@ -52,6 +61,9 @@ if ($input) {
         $input['city'],
         $input['region'],
         $input['postal_code'],
+     $sub_email,   
+        $sub_sms,     
+        $sub_blog,
         $user_id
     );
 
@@ -941,9 +953,9 @@ if ($input && isset($input['action']) && $input['action'] === 'delete_account') 
         city: "<?php echo addslashes($user['City']); ?>",
         region: "<?php echo addslashes($user['Region']); ?>",
         postal_code: "<?php echo addslashes($user['Postal_Code']); ?>",
-        sub_sms: <?php echo $sub_sms ? 'true' : 'false'; ?>,
-        sub_email: <?php echo $sub_email ? 'true' : 'false'; ?>,
-        sub_blog_following: <?php echo $sub_blog ? 'true' : 'false'; ?>
+  sub_sms: <?php echo !empty($user['Sub_SMS']) && $user['Sub_SMS'] == 1 ? 'true' : 'false'; ?>,
+sub_email: <?php echo !empty($user['Sub_Email']) && $user['Sub_Email'] == 1 ? 'true' : 'false'; ?>,
+sub_blog_following: <?php echo !empty($user['Sub_Blog_Following']) && $user['Sub_Blog_Following'] == 1 ? 'true' : 'false'; ?>
         };
 
         // Initialize page with profile data
@@ -1011,9 +1023,14 @@ if ($input && isset($input['action']) && $input['action'] === 'delete_account') 
         street: document.getElementById('editStreet').value,
         city: document.getElementById('editCity').value,
         region: document.getElementById('editRegion').value,
-        postal_code: document.getElementById('editPostalCode').value
-    };
+        postal_code: document.getElementById('editPostalCode').value,
+         emailNotification: document.getElementById('emailToggle').checked ? 1 : 0,
+        smsNotification: document.getElementById('smsToggle').checked ? 1 : 0,
+        blogNotifation: document.getElementById('blogToggle').checked ? 1 : 0,
 
+
+    };
+console.log ("Profile data from edit", JSON.stringify(profileData))
     // Send data to the same page via POST
     fetch(window.location.href, {
         method: 'POST',
