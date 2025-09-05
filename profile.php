@@ -76,22 +76,17 @@ if ($input) {
 }
 
 
-// User delete action
+//User delete action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteUserId'])) {
-    session_start(); // make sure session is started
     $userId = intval($_POST['deleteUserId']); // sanitize input
 
-    $sql = "DELETE FROM Users WHERE User_ID = ? LIMIT 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $userId);
-
-    if ($stmt->execute()) {
-        session_destroy(); 
-        echo json_encode(['success' => true]); 
+    $sql = "DELETE FROM users WHERE User_ID = $userId LIMIT 1";
+    if ($conn->query($sql)) {
+        echo "User deleted successfully.";
     } else {
-        echo json_encode(['success' => false, 'message' => $stmt->error]);
+        echo "Error deleting user: " . $conn->error;
     }
-    exit; // stop any further output
+    exit;
 }
 
 //Change password action api 
@@ -869,7 +864,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </button>
 
               <?php if (isset($_SESSION['role']) && $_SESSION['role'] !== 'Admin'): ?>
-    <button class="action-button danger-button" onclick="deleteAccount(<?php echo $_SESSION['user_id']; ?>)">
+ <button class="action-btn danger-button" onclick="deleteAccount(<?php echo $user['User_ID']; ?>)">
         🗑️ Delete Account
     </button>
 <?php endif; ?>
@@ -1185,16 +1180,13 @@ console.log("userID:",user_id)
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'deleteUserId=' + encodeURIComponent(user_id)
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            // Redirect to signup page after deletion
-               showNotification('Accound Deleted Successfully', 'success');
-            window.location.href = 'signup.php';
-        } else {
-            showNotification('Error deleting account: ' + data.message, 'error');
-        }
-    })
+    .then(response => response.text())
+        .then(data => {
+            showNotification('Account deleted successfully!', 'success');
+                setTimeout(() => {
+        window.location.href = 'login.php';
+    }, 1000); 
+        })
     .catch(err => console.error(err));
 }
 
