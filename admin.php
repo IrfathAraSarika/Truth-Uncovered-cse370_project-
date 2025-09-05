@@ -89,6 +89,59 @@ $agencies = [
             color: #ffffff;
             overflow-x: hidden;
         }
+
+  header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+              nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+            .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor:pointer;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+                .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .container {
+            max-width:1200px;
+            margin:auto;
+        }
+
+
+
 .dark-view {
     background: #1e1e1e;
     color: #f1f1f1;
@@ -182,8 +235,8 @@ $agencies = [
         .dashboard-container {
             position: relative;
             z-index: 10;
-            padding: 20px;
-            max-width: 1400px;
+            padding: 30px;
+     
             margin: 0 auto;
         }
 
@@ -383,6 +436,7 @@ $agencies = [
         /* Tables */
         .table-container {
             overflow-x: auto;
+            
         }
 
         .data-table {
@@ -655,21 +709,20 @@ $agencies = [
         <div class="floating-orb orb2"></div>
         <div class="floating-orb orb3"></div>
     </div>
+      <header>
+        <div class="container">
+            <nav>
+                <div class="logo"   onclick="window.location.href='index.php'">🔍 TruthUncovered</div>
+                <div class="nav-actions">
+                    <a href="index.php" class="back-button">← Back to Home Page</a>
+                </div>
+            </nav>
+        </div>
+    </header>
 
     <div class="dashboard-container">
         <!-- Header -->
-        <div class="dashboard-header">
-            <div class="header-left">
-                <div class="logo-icon">🔍</div>
-                <div>
-                    <div class="header-title">TRUTH UNCOVERED</div>
-                    <div class="header-subtitle">Admin Control Panel</div>
-                </div>
-            </div>
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
+       
 
         <!-- Statistics Cards -->
         <div class="stats-grid">
@@ -743,12 +796,14 @@ $agencies = [
                         <tr>
                             <td><?php echo htmlspecialchars($report['Report_ID']); ?></td>
                             <td><?php echo htmlspecialchars($report['Title']); ?></td>
-                            <td>
-                                <?php 
-                                // If you have a users table, join it for reporter_name
-                                echo !empty($report['User_ID']) ? "User #" . $report['User_ID'] : "Anonymous"; 
-                                ?>
-                            </td>
+                        <td>
+    <?= !empty($report['User_ID']) 
+        ? ($u = $conn->query("SELECT Name FROM users WHERE User_ID = {$report['User_ID']}")->fetch_assoc()) 
+            ? htmlspecialchars($u['Name']) 
+            : "Anonymous" 
+        : "Anonymous" ?>
+</td>
+
                             <td>
                                 <span class="status-badge status-<?php echo strtolower($report['Status']); ?>">
                                     <?php echo htmlspecialchars($report['Status']); ?>
