@@ -6,90 +6,67 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php');
     exit();
 }
+// Fetch all users (or just the logged-in user)
+$sql = "SELECT * FROM reports";
+$result = $conn->query($sql);
+$reports = $result->fetch_all(MYSQLI_ASSOC);
 
-// Handle AJAX requests
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-//     header('Content-Type: application/json');
-    
-//     switch ($_POST['action']) {
-//         case 'update_report_status':
-//             $reportId = $_POST['report_id'];
-//             $status = $_POST['status'];
-//             $agency = $_POST['agency'] ?? null;
-            
-//             $stmt = $conn->prepare("UPDATE reports SET status = ?, assigned_agency = ? WHERE id = ?");
-//             $result = $stmt->execute([$status, $agency, $reportId]);
-//             echo json_encode(['success' => $result]);
-//             exit();
-            
-//         case 'delete_user':
-//             $userId = $_POST['user_id'];
-//             $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-//             $result = $stmt->execute([$userId]);
-//             echo json_encode(['success' => $result]);
-//             exit();
-            
-//         case 'delete_blog':
-//             $blogId = $_POST['blog_id'];
-//             $stmt = $conn->prepare("DELETE FROM blog_posts WHERE id = ?");
-//             $result = $stmt->execute([$blogId]);
-//             echo json_encode(['success' => $result]);
-//             exit();
-            
-//         case 'get_report_details':
-//             $reportId = $_POST['report_id'];
-//             $stmt = $conn->prepare("SELECT * FROM reports WHERE id = ?");
-//             $stmt->execute([$reportId]);
-//             $report = $stmt->fetch(PDO::FETCH_ASSOC);
-//             echo json_encode($report);
-//             exit();
-//     }
-// }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_report_status') {
 
-// // Fetch data for dashboard
-// try {
-//     // Get reports
-//     $reportsStmt = $conn->prepare("SELECT r.*, u.Name as reporter_name FROM reports r LEFT JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC");
-//     $reportsStmt->execute();
-//     $reports = $reportsStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Sanitize inputs
+    $report_id = intval($_POST['report_id']);
+    $status = $_POST['status'] ?? '';
+    $agency = $_POST['agency'] ?? null;
 
-//     // Get users
-//     $usersStmt = $conn->prepare("SELECT * FROM users ORDER BY created_at DESC");
-//     $usersStmt->execute();
-//     $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Debugging: log inputs
+echo "<pre>";
+print_r($_POST);  // shows all POST data
+echo "</pre>";
 
-//     // Get blog posts
-//     $blogStmt = $conn->prepare("SELECT b.*, u.Name as author_name FROM blog_posts b LEFT JOIN users u ON b.author_id = u.id ORDER BY b.created_at DESC");
-//     $blogStmt->execute();
-//     $blogs = $blogStmt->fetchAll(PDO::FETCH_ASSOC);
+ 
 
-//     // Get statistics
-//     $totalReports = count($reports);
-//     $pendingReports = count(array_filter($reports, fn($r) => $r['status'] === 'pending'));
-//     $totalUsers = count($users);
-//     $totalBlogs = count($blogs);
-    
-// } catch (PDOException $e) {
-//     // Create sample data if tables don't exist
-//     $reports = [];
-//     $users = [];
-//     $blogs = [];
-//     $totalReports = 0;
-//     $pendingReports = 0;
-//     $totalUsers = 0;
-//     $totalBlogs = 0;
-// }
+    // Prepare and execute update
+    $stmt = $conn->prepare("UPDATE reports SET Status = ?, AssignedAgency = ? WHERE Report_ID = ?");
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Prepare failed: ' . $conn->error]);
+        error_log("Prepare failed: " . $conn->error);
+        exit;
+    }
 
+    $stmt->bind_param("ssi", $status, $agency, $report_id);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true]);
+        error_log("Report updated successfully: report_id=$report_id");
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database update failed: ' . $stmt->error]);
+        error_log("Execute failed: " . $stmt->error);
+    }
+
+  
+}
 // Sample agencies list
 $agencies = [
-    'Anti-Corruption Commission',
-    'Police Department',
-    'Environmental Protection Agency',
-    'Health Ministry',
-    'Education Ministry',
-    'Transport Authority',
-    'Local Government',
-    'Consumer Rights Protection'
+    ['id' => 1,  'name' => 'Anti-Corruption Commission (Government)'],
+    ['id' => 7,  'name' => 'National Board of Revenue (Government)'],
+    ['id' => 6,  'name' => 'Bangladesh Bank (Government)'],
+    ['id' => 11, 'name' => 'Transparency International Bangladesh (NGO)'],
+    ['id' => 2,  'name' => 'Dhaka Metropolitan Police (Police)'],
+    ['id' => 3,  'name' => 'Bangladesh Police Headquarters (Police)'],
+    ['id' => 4,  'name' => 'Ministry of Home Affairs (Government)'],
+    ['id' => 8,  'name' => 'Rapid Action Battalion - RAB (Police)'],
+    ['id' => 9,  'name' => 'Detective Branch - DB (Police)'],
+    ['id' => 10, 'name' => 'Traffic Police (Police)'],
+    ['id' => 17, 'name' => 'Bangladesh Environmental Lawyers Association (NGO)'],
+    ['id' => 18, 'name' => 'Dhaka Ahsania Mission (NGO)'],
+    ['id' => 5,  'name' => 'Ministry of Women and Children Affairs (Government)'],
+    ['id' => 20, 'name' => 'ActionAid Bangladesh (NGO)'],
+    ['id' => 12, 'name' => 'BRAC (NGO)'],
+    ['id' => 13, 'name' => 'Ain o Salish Kendra (NGO)'],
+    ['id' => 14, 'name' => 'Bangladesh Legal Aid and Services Trust (NGO)'],
+    ['id' => 15, 'name' => 'Manusher Jonno Foundation (NGO)'],
+    ['id' => 16, 'name' => 'Odhikar (NGO)'],
+    ['id' => 19, 'name' => 'Proshika (NGO)'],
 ];
 ?>
 
@@ -701,7 +678,7 @@ $agencies = [
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="stat-number"> 2000</div>
+                <div class="stat-number"> <?php echo count($reports); ?></div>
                 <div class="stat-label">Total Reports</div>
             </div>
             <div class="stat-card">
@@ -735,102 +712,70 @@ $agencies = [
         </div>
 
         <!-- Reports Section -->
-        <div id="reports-section" class="content-section active">
-            <div class="section-card">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-file-alt"></i>
-                        Reports Management
-                    </h2>
-                </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Reporter</th>
-                                <th>Status</th>
-                                <th>Agency</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reports-table-body">
-                            <?php if (empty($reports)): ?>
-                            <tr>
-                                <td>001</td>
-                                <td>Road Construction Corruption</td>
-                                <td>John Smith</td>
-                                <td><span class="status-badge status-pending">Pending</span></td>
-                                <td>Not Assigned</td>
-                                <td>2024-01-15</td>
-                                <td>
-                                    <button class="action-btn" onclick="viewReport(1)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn" onclick="updateReport(1)">
-                                        <i class="fas fa-edit"></i> Update
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Hospital Medicine Shortage</td>
-                                <td>Sarah Johnson</td>
-                                <td><span class="status-badge status-accepted">Accepted</span></td>
-                                <td>Health Ministry</td>
-                                <td>2024-01-14</td>
-                                <td>
-                                    <button class="action-btn" onclick="viewReport(2)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn" onclick="updateReport(2)">
-                                        <i class="fas fa-edit"></i> Update
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>School Fund Misuse</td>
-                                <td>Mike Wilson</td>
-                                <td><span class="status-badge status-declined">Declined</span></td>
-                                <td>Education Ministry</td>
-                                <td>2024-01-13</td>
-                                <td>
-                                    <button class="action-btn" onclick="viewReport(3)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn" onclick="updateReport(3)">
-                                        <i class="fas fa-edit"></i> Update
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php else: ?>
-                            <?php foreach ($reports as $report): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($report['id']); ?></td>
-                                <td><?php echo htmlspecialchars($report['title'] ?? 'Untitled'); ?></td>
-                                <td><?php echo htmlspecialchars($report['reporter_name'] ?? 'Unknown'); ?></td>
-                                <td><span class="status-badge status-<?php echo htmlspecialchars($report['status']); ?>"><?php echo ucfirst($report['status']); ?></span></td>
-                                <td><?php echo htmlspecialchars($report['assigned_agency'] ?? 'Not Assigned'); ?></td>
-                                <td><?php echo date('Y-m-d', strtotime($report['created_at'])); ?></td>
-                                <td>
-                                    <button class="action-btn" onclick="viewReport(<?php echo $report['id']; ?>)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn" onclick="updateReport(<?php echo $report['id']; ?>)">
-                                        <i class="fas fa-edit"></i> Update
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      <div id="reports-section" class="content-section active">
+    <div class="section-card">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-file-alt"></i>
+                Reports Management
+            </h2>
         </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Reporter</th>
+                        <th>Status</th>
+                        <th>Agency</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-table-body">
+                    <?php if (empty($reports)): ?>
+                        <tr>
+                            <td colspan="7" style="text-align:center;">No reports found</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($reports as $report): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($report['Report_ID']); ?></td>
+                            <td><?php echo htmlspecialchars($report['Title']); ?></td>
+                            <td>
+                                <?php 
+                                // If you have a users table, join it for reporter_name
+                                echo !empty($report['User_ID']) ? "User #" . $report['User_ID'] : "Anonymous"; 
+                                ?>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<?php echo strtolower($report['Status']); ?>">
+                                    <?php echo htmlspecialchars($report['Status']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?php echo !empty($report['AssignedAgency']) ?  $report['AssignedAgency'] : "Not Assigned"; ?>
+                            </td>
+                            <td>
+                                <?php echo !empty($report['Date_Submitted']) ? $report['Date_Submitted'] : "-"; ?>
+                            </td>
+                            <td>
+                                <button class="action-btn" onclick="viewReport(<?php echo $report['Report_ID']; ?>)">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="action-btn" onclick="updateReport(<?php echo $report['Report_ID']; ?>)">
+                                    <i class="fas fa-edit"></i> Update
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         <!-- Users Section -->
         <div id="users-section" class="content-section">
@@ -1026,20 +971,8 @@ $agencies = [
             </div>
             <div id="reportModalBody">
                 <div class="form-group">
-                    <label class="form-label">Report Title</label>
-                    <input type="text" id="reportTitle" class="form-input" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea id="reportDescription" class="form-textarea" readonly></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Reporter</label>
-                    <input type="text" id="reportReporter" class="form-input" readonly>
-                </div>
-                <div class="form-group">
                     <label class="form-label">Status</label>
-                    <select id="reportStatus" class="form-select">
+                    <select id="reportUpdateStatus" class="form-select">
                         <option value="pending">Pending</option>
                         <option value="accepted">Accepted</option>
                         <option value="declined">Declined</option>
@@ -1047,12 +980,16 @@ $agencies = [
                 </div>
                 <div class="form-group">
                     <label class="form-label">Assign Agency</label>
-                    <select id="reportAgency" class="form-select">
-                        <option value="">Select Agency</option>
-                        <?php foreach ($agencies as $agency): ?>
-                        <option value="<?php echo htmlspecialchars($agency); ?>"><?php echo htmlspecialchars($agency); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <select id="reportUpdateAgency" class="form-select">                  
+                    <option value="" disabled selected>Choose an institution</option>
+                    <?php foreach ($agencies as $agency): ?>
+                        <option value="<?php echo $agency['name']; ?>">
+                            <?php echo htmlspecialchars($agency['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+
                 </div>
             </div>
             <div class="modal-actions">
@@ -1067,7 +1004,7 @@ $agencies = [
     </div>
 
 
-<!-- ........................extra starts.............. -->
+<!-- ........................View  Modal starts.............. -->
 <div id="reportModal" class="modal">
     <div class="modal-content dark-view">
         <div class="modal-header">
@@ -1097,7 +1034,7 @@ $agencies = [
             </figure>
 
             <p>
-                <strong>Reporter:</strong> <span id="reportReporter">John Doe</span><br>
+                <strong>Author:</strong> <span id="reportReporter">John Doe</span><br>
                 <strong>Status:</strong> <span id="reportStatus">Pending Review</span><br>
                 <strong>Assigned Agency:</strong> <span id="reportAgency">City Safety Department</span>
             </p>
@@ -1108,17 +1045,7 @@ $agencies = [
 </div>
 
 
-
-<!-- ........................extra ends.............. -->
-
-
-
-
-
-
-
-
-
+<!-- ........................View Modal  ends.............. -->
 
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal">
@@ -1143,10 +1070,12 @@ $agencies = [
 
     <script>
         // Current report being edited
+            // Pass PHP reports array to JS
+    const reportsData = <?php echo json_encode($reports); ?>;
         let currentReportId = null;
         let deleteAction = null;
         let deleteId = null;
-
+        let seletedReportId=null;
         // Tab switching
         function switchTab(tab) {
             // Update tab buttons
@@ -1171,59 +1100,57 @@ $agencies = [
         }
 
         // Report functions
-        function viewReport(reportId,updateFlag=false) {
-            currentReportId = reportId;
-            
-            // In a real application, you would fetch report details from the server
-            // For demo purposes, we'll use sample data
-            const sampleReports = {
-                1: {
-                    title: 'Road Construction Corruption',
-                    description: 'There are allegations of corruption in the recent road construction project in downtown area. Materials used seem to be of poor quality despite high budget allocation.',
-                    reporter: 'John Smith',
-                    status: 'pending',
-                    agency: ''
-                },
-                2: {
-                    title: 'Hospital Medicine Shortage',
-                    description: 'Patients are reporting severe shortage of essential medicines in the city hospital. This might be due to mismanagement or corruption in procurement.',
-                    reporter: 'Sarah Johnson',
-                    status: 'accepted',
-                    agency: 'Health Ministry'
-                },
-                3: {
-                    title: 'School Fund Misuse',
-                    description: 'School development funds allocated by the government seem to be misused. Infrastructure remains poor despite significant budget approval.',
-                    reporter: 'Mike Wilson',
-                    status: 'declined',
-                    agency: 'Education Ministry'
-                }
-            };
+function viewReport(reportId, updateFlag = false) {
+    currentReportId = reportId;
 
-            const report = sampleReports[reportId] || sampleReports[1];
-            
-            document.getElementById('reportTitle').value = report.title;
-            document.getElementById('reportDescription').value = report.description;
-            document.getElementById('reportReporter').value = report.reporter;
-            document.getElementById('reportStatus').value = report.status;
-            document.getElementById('reportAgency').value = report.agency;
-            
-            if (updateFlag){
-             openModal('reportUpdateModal')
-            }
-            else {
-            openModal('reportModal');
-            }
-          
-        }
+    // Find the report in the reportsData array
+    const report = reportsData.find(r => parseInt(r.Report_ID) === parseInt(reportId));
+
+    console.log("report data:",report)
+    if (!report) {
+        alert("Report not found");
+        return;
+    }
+
+    // Populate modal content
+   document.getElementById('reportTitle').innerText = report.Title || 'Untitled';
+    document.getElementById('reportDescription').innerText = report.Description || 'No description provided';
+    document.getElementById('reportReporter').innerText = report.User_ID || 'Anonymous'; // Or map to username
+    document.getElementById('reportStatus').innerText = report.Status || 'N/A';
+    document.getElementById('reportAgency').innerText = report.AssignedAgency || 'Not Assigned';
+
+    // Populate evidence image dynamically
+    const evidence = document.getElementById('reportEvidence');
+    if (report.file_path) {
+        evidence.innerHTML = `
+            <img src="${report.file_path}" 
+                 alt="Report Evidence" 
+                 style="max-width:100%; border-radius:10px; margin-top:1rem; box-shadow:0 3px 8px rgba(0,0,0,0.4);" />
+            <figcaption style="font-size:0.9rem; color:#bbb; margin-top:0.5rem;">
+                Evidence provided by the reporter
+            </figcaption>`;
+    } else {
+        evidence.innerHTML = `<p style="color:#bbb;">No evidence provided</p>`;
+    }
+
+    // Open the correct modal
+    if (updateFlag) {
+        openModal('reportUpdateModal');
+    } else {
+        openModal('reportModal');
+    }
+}
+
 
         function updateReport(reportId) {
-            viewReport(reportId,true);
+            seletedReportId=reportId;
+         openModal('reportUpdateModal');
         }
 
         function saveReportUpdate() {
-            const status = document.getElementById('reportStatus').value;
-            const agency = document.getElementById('reportAgency').value;
+            // console.log("seletedReportId",seletedReportId)
+            const status = document.getElementById('reportUpdateStatus').value;
+            const agency = document.getElementById('reportUpdateAgency').value;
             
             // Show loading state
             const saveBtn = event.target;
@@ -1236,7 +1163,7 @@ $agencies = [
                 // In real application, make AJAX call to update report
                 const formData = new FormData();
                 formData.append('action', 'update_report_status');
-                formData.append('report_id', currentReportId);
+                formData.append('report_id', seletedReportId);
                 formData.append('status', status);
                 formData.append('agency', agency);
 
@@ -1248,18 +1175,21 @@ $agencies = [
                 .then(data => {
                     if (data.success) {
                         // Update the table row
-                        updateReportRow(currentReportId, status, agency);
-                        closeModal('reportModal');
+                        console.log("Formdata",data)
+                        updateReportRow(seletedReportId, status, agency);
+                       
                         showNotification('Report updated successfully!', 'success');
+                         closeModal('reportUpdateModal');
                     } else {
+                        
                         showNotification('Failed to update report. Please try again.', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     showNotification('Report updated successfully!', 'success'); // For demo
-                    updateReportRow(currentReportId, status, agency);
-                    closeModal('reportModal');
+                    updateReportRow(seletedReportId, status, agency);
+                    closeModal('reportUpdateModal');
                 })
                 .finally(() => {
                     saveBtn.innerHTML = originalText;
