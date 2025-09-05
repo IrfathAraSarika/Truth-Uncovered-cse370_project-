@@ -144,6 +144,12 @@ $agencies = [
             align-items: center;
             padding: 1rem 0;
         }
+        .button-wrapper {
+                display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap:10px;
+        }
             .logo {
             font-size: 1.8rem;
             font-weight: 800;
@@ -753,9 +759,15 @@ $agencies = [
         <div class="container">
             <nav>
                 <div class="logo"   onclick="window.location.href='index.php'">🔍 TruthUncovered</div>
+                <div class="button-wrapper">
+<div class="nav-actions">
+                    <a href="analytic.php" class="back-button">Analytics </a>
+                </div>
                 <div class="nav-actions">
                     <a href="index.php" class="back-button">← Back to Home Page</a>
                 </div>
+                </div>
+                
             </nav>
         </div>
     </header>

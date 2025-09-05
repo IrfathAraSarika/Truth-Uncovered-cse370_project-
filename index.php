@@ -983,7 +983,7 @@ if (isset($_GET['logout'])) {
 
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                 <div class="nav-actions">
-                    <a href="analytic.php" class="back-button">Analytics Dashboard</a>
+                    <a href="admin.php" class="back-button">Admin Dashboard</a>
                 </div>
             <?php endif; ?>
 

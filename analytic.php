@@ -591,7 +591,7 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
             <nav>
                 <div class="logo"   onclick="window.location.href='index.php'">🔍 TruthUncovered</div>
                 <div class="nav-actions">
-                    <a href="index.php" class="back-button">← Back to Home Page</a>
+                    <a href="admin.php" class="back-button"> ←  Admin Dashboard</a>
                 </div>
             </nav>
         </div>
