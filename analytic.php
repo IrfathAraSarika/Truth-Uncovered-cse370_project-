@@ -783,6 +783,11 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
             });
 
             // Distribution Chart
+             const corruptionCount = <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 1")->fetch_row()[0] ?>;
+    const antisocialCount = <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 2")->fetch_row()[0] ?>;
+    const hazardsCount = <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 3")->fetch_row()[0] ?>;
+    const harassmentCount = <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 4")->fetch_row()[0] ?>;
+    const dowryCount = <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 5")->fetch_row()[0] ?>;
             const distributionCtx = document.getElementById('distributionChart').getContext('2d');
             distributionChart = new Chart(distributionCtx, {
                 type: 'doughnut',
@@ -790,11 +795,11 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
                     labels: ['Harassment', 'Antisocial', 'Corruption', 'Dowry', 'Hazards'],
                     datasets: [{
                         data: [
-                            analyticsData.harassment.total_cases,
-                            analyticsData.antisocial.total_cases,
-                            analyticsData.corruption.total_cases,
-                            analyticsData.dowry.total_cases,
-                            analyticsData.hazards.total_cases
+                           harassmentCount,
+        antisocialCount,
+        corruptionCount,
+        dowryCount,
+        hazardsCount
                         ],
                         backgroundColor: [
                             '#ec4899',
