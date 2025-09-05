@@ -680,17 +680,20 @@ $agencies = [
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-number">400</div>
+                <div class="stat-number"><div class="stat-number">
+    <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Status = 'pending'")->fetch_row()[0] ?>
+</div>
+</div>
                 <div class="stat-label">Pending Reports</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-number">5000</div>
+                <div class="stat-number"><?= $conn->query("SELECT COUNT(*) FROM users")->fetch_row()[0] ?></div>
                 <div class="stat-label">Total Users</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-blog"></i></div>
-                <div class="stat-number">200</div>
+                <div class="stat-number"><?= $conn->query("SELECT COUNT(*) FROM blogposts")->fetch_row()[0] ?></div>
                 <div class="stat-label">Blog Posts</div>
             </div>
         </div>
