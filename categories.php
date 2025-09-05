@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'], $_POST
         /* Categories Grid */
         .categories-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 30px;
             margin-top: 60px;
         }
@@ -715,10 +715,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'], $_POST
             });
             
             // Simulate navigation to category details page
-            setTimeout(() => {
-                alert(`Loading ${categoryType} investigation dashboard...`);
-                // In real implementation: window.location.href = `category-details.php?type=${categoryType}`;
-            }, 500);
+          
         }
 
         // Interactive animations
