@@ -1226,7 +1226,6 @@ if (!empty($_SESSION['notification'])): ?>
                 <button class="action-button"   onclick="window.location.href='institutionranking.php'" >View Full Rankings</button>
             </div>
 
-            <!-- Case Status Timeline -->
         
 
       
