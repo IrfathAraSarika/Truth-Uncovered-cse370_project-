@@ -19,6 +19,12 @@ $sql_users = "SELECT * FROM users";
 $result_users = $conn->query($sql_users);
   $users = $result_users->fetch_all(MYSQLI_ASSOC);
 
+//Fetc  
+//Fetch all Blogpost details
+$sql_blogs = "SELECT * FROM blogposts"; 
+$result_blogs = $conn->query($sql_blogs);
+  $blogs = $result_blogs->fetch_all(MYSQLI_ASSOC);
+
 //Update action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_report_status') {
 
@@ -956,7 +962,7 @@ $agencies = [
                             <tr>
                                 <th>ID</th>
                                 <th>Title</th>
-                                <th>Author</th>
+                                <th>Author ID</th>
                                 <th>Category</th>
                                 <th>Status</th>
                                 <th>Date</th>
@@ -1016,17 +1022,17 @@ $agencies = [
                             <?php else: ?>
                             <?php foreach ($blogs as $blog): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($blog['id']); ?></td>
-                                <td><?php echo htmlspecialchars($blog['title']); ?></td>
-                                <td><?php echo htmlspecialchars($blog['author_name'] ?? 'Unknown'); ?></td>
-                                <td><?php echo htmlspecialchars($blog['category'] ?? 'General'); ?></td>
-                                <td><?php echo htmlspecialchars($blog['status'] ?? 'Published'); ?></td>
-                                <td><?php echo date('Y-m-d', strtotime($blog['created_at'])); ?></td>
+                                <td><?php echo htmlspecialchars($blog['Post_ID']); ?></td>
+                                <td><?php echo htmlspecialchars($blog['Title']); ?></td>
+                                <td><?php echo htmlspecialchars($blog['Author_ID'] ?? 'Unknown'); ?></td>
+                                <td><?php echo htmlspecialchars($blog['Category'] ?? 'General'); ?></td>
+                                <td><?php echo htmlspecialchars($blog['Status'] ?? 'Published'); ?></td>
+                                <td><?php echo date('Y-m-d', strtotime($blog['Published_At'])); ?></td>
                                 <td>
-                                    <button class="action-btn" onclick="viewBlog(<?php echo $blog['id']; ?>)">
+                                    <button class="action-btn" onclick="viewBlog(<?php echo $blog['Post_ID']; ?>)">
                                         <i class="fas fa-eye"></i> View
                                     </button>
-                                    <button class="action-btn danger" onclick="deleteBlog(<?php echo $blog['id']; ?>)">
+                                    <button class="action-btn danger" onclick="deleteBlog(<?php echo $blog['Post_ID']; ?>)">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </td>
@@ -1125,6 +1131,39 @@ $agencies = [
 
 <!-- ........................View Modal  ends.............. -->
 
+
+         <!-- Blog v modal starts here  -->
+       
+<div id="blogReportModal" class="modal">
+    <div class="modal-content dark-view">
+        <div class="modal-header">
+            <h3 class="modal-title">Blog Details</h3>
+            <button class="close-btn" onclick="closeModal('blogReportModal')">&times;</button>
+        </div>
+
+        <div id="reportModalBody" class="article-view">
+            <h2 id="blogReportTitle">Unauthorized Construction Near Residential Area</h2>
+
+            <p id="blogReportDescription">
+                A concerned citizen has reported the construction of a building 
+                that is allegedly being built without the necessary permits. 
+                The structure, located near a densely populated neighborhood, 
+                is raising safety concerns among local residents. According to 
+                eyewitnesses, the construction has been ongoing for several weeks 
+                with no visible signs of authorization from the city authorities.
+            </p>
+
+            <p>
+                <strong>Author :</strong> <span id="blogReportReporter">John Doe</span><br>
+                <strong>Status:</strong> <span id="blogReportStatus">Pending Review</span><br>
+        
+            </p>
+        </div>
+
+      
+    </div>
+</div>
+      <!-- Blog view modal starts here  -->
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal">
         <div class="modal-content" style="max-width: 400px;">
@@ -1150,6 +1189,7 @@ $agencies = [
         // Current report being edited
             // Pass PHP reports array to JS
     const reportsData = <?php echo json_encode($reports); ?>;
+    const blogsData=<?php echo json_encode($blogs); ?>;
         let currentReportId = null;
         let deleteAction = null;
         let deleteId = null;
@@ -1254,10 +1294,10 @@ function viewReport(reportId, updateFlag = false) {
                 .then(data => {
                     if (data.success) {
                         // Update the table row
-                        console.log("Formdata",data)
                         updateReportRow(seletedReportId, status, agency);
                        
                         showNotification('Report updated successfully!', 'success');
+                            location.reload();
                          closeModal('reportUpdateModal');
                     } else {
                         
@@ -1268,6 +1308,7 @@ function viewReport(reportId, updateFlag = false) {
                     console.error('Error:', error);
                     showNotification('Report updated successfully!', 'success'); // For demo
                     updateReportRow(seletedReportId, status, agency);
+
                     closeModal('reportUpdateModal');
                 })
                 .finally(() => {
@@ -1310,8 +1351,8 @@ function deleteUser(userId) {
         })
         .then(response => response.text())
         .then(data => {
-          
-            location.reload(); // reload page to reflect changes
+            showNotification('Report deleted successfully!', 'success');
+            location.reload();
         })
         .catch(error => console.error('Error:', error));
     };
@@ -1322,8 +1363,25 @@ function deleteUser(userId) {
 
         // Blog functions
         function viewBlog(blogId) {
-            // In a real application, you might open a blog preview modal
-            showNotification('Blog preview feature would be implemented here.', 'info');
+              currentBlogId = blogId;
+
+    // Find the report in the reportsData array
+    const report = blogsData.find(r => parseInt(r.Post_ID) === parseInt(currentBlogId));
+
+    console.log("report data:",report)
+    if (!report) {
+        alert("Report not found");
+        return;
+    }
+
+    // Populate modal content
+   document.getElementById('blogReportTitle').innerText = report.Title || 'Untitled';
+    document.getElementById('blogReportDescription').innerText = report.Content || 'No description provided';
+    document.getElementById('blogReportReporter').innerText = report.Author_ID || 'Anonymous'; // Or map to username
+    document.getElementById('blogReportStatus').innerText = report.Status || 'N/A';
+   
+        openModal('blogReportModal');
+    
         }
 
         function deleteBlog(blogId) {
