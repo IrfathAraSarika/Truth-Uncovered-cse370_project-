@@ -99,6 +99,38 @@ if ($input && isset($input['action']) && $input['action'] === 'delete_account') 
     exit(); // Stop further HTML output for AJAX
 }
 
+//Change password action api 
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'updatePassword') {
+    header('Content-Type: application/json');
+
+    $user_id = $_SESSION['user_id'];
+    $currentPassword = $_POST['currentPassword'] ?? '';
+    $newPassword = $_POST['newPassword'] ?? '';
+
+    // Fetch current password from DB
+    $stmt = $conn->prepare("SELECT Password FROM Users WHERE User_ID = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+ 
+
+    // Update password
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("UPDATE Users SET Password = ? WHERE User_ID = ?");
+    $stmt->bind_param("si", $hashedPassword, $user_id);
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => $stmt->error]);
+    }
+    exit;
+}
+
+
+
 
 
 ?>
@@ -1085,9 +1117,31 @@ console.log ("Profile data from edit", JSON.stringify(profileData))
                 return;
             }
             
-            // Simulate password update
+            // Send request to the same page
+    const formData = new FormData();
+    formData.append('action', 'updatePassword'); // indicate action to backend
+    formData.append('currentPassword', currentPassword);
+    formData.append('newPassword', newPassword);
+for (let pair of formData.entries()) {
+    console.log(pair[0] + ': ' + pair[1]);
+}
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
             showNotification('Password updated successfully!', 'success');
             closePasswordModal();
+        } else {
+            showNotification(data.message || 'Failed to update password', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred. Please try again.', 'error');
+    });
         }
 
         // Notification Settings
