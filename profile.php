@@ -872,9 +872,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <button class="action-button" onclick="downloadData()">
                     📥 Download My Data
                 </button>
-                <button class="action-button danger-button" onclick="deleteAccount()">
-                    🗑️ Delete Account
-                </button>
+
+              <?php if (isset($_SESSION['role']) && $_SESSION['role'] !== 'Admin'): ?>
+    <button class="action-button danger-button" onclick="deleteAccount()">
+        🗑️ Delete Account
+    </button>
+<?php endif; ?>
+
             </div>
         </div>
     </main>

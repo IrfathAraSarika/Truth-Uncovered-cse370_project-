@@ -33,7 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             elseif ($password === $user['Password']) {
                 $_SESSION['user_id'] = $user['User_ID'];
                 $_SESSION['email']   = $user['Email'];
-                  $_SESSION['username'] = $user['Role'];
+                  $_SESSION['username'] = $user['Name'];
+                $_SESSION['role'] = $user['Role'];
                 header("Location: index.php");
                 exit;
             }
