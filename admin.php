@@ -755,7 +755,10 @@ $agencies = [
                                 </span>
                             </td>
                             <td>
-                                <?php echo !empty($report['AssignedAgency']) ?  $report['AssignedAgency'] : "Not Assigned"; ?>
+                              <?= (isset($report['AssignedAgency']) && trim($report['AssignedAgency']) !== '' && strtolower(trim($report['AssignedAgency'])) !== 'null') 
+    ? $report['AssignedAgency'] 
+    : "Not Assigned" ?>
+
                             </td>
                             <td>
                                 <?php echo !empty($report['Date_Submitted']) ? $report['Date_Submitted'] : "-"; ?>
