@@ -864,7 +864,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </button>
 
               <?php if (isset($_SESSION['role']) && $_SESSION['role'] !== 'Admin'): ?>
- <button class="action-btn danger-button" onclick="deleteAccount(<?php echo $user['User_ID']; ?>)">
+ <button class="action-button danger-button" onclick="deleteAccount(<?php echo $user['User_ID']; ?>)">
         🗑️ Delete Account
     </button>
 <?php endif; ?>

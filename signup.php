@@ -36,6 +36,7 @@ echo "<script>console.log(" . json_encode($data) . ")</script>";
 $success = $error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (registerUser($conn, $_POST)) {
+         header("Location: login.php");
         $success = "✅ Account created successfully!";
     } else {
         $error = "❌ Something went wrong. Try again.";
@@ -536,7 +537,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div id="messageContainer" style="display: none;"></div>
 
             <!-- Signup Form -->
-            <form method="POST" action="login.php" id="signupForm">
+            <form method="POST" action="" id="signupForm">
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="name">Full Name</label>
@@ -774,10 +775,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 btn.style.opacity = '0.7';
 
                 // Simulate form processing
+           
                 setTimeout(() => {
-                    showMessage('Account created successfully! Welcome to the investigation network.', 'success');
+          showMessage('Account created successfully! Welcome to the investigation network.', 'success');
                     btn.disabled = false;
                     btn.style.opacity = '1';
+                    
                     btnText.innerHTML = 'JOIN THE INVESTIGATION';
                 }, 2000);
             }
