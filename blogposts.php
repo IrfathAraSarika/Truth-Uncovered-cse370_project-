@@ -245,15 +245,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           const category = document.getElementById('category').value.trim();
           
           if (title && content && category) {
-            if (!confirm('Are you sure you want to publish this blog post?')) {
-              e.preventDefault();
-            } else {
               // Show loading state
               const submitBtn = this.querySelector('button[type="submit"]');
               submitBtn.style.opacity = '0.6';
               submitBtn.innerHTML = '⏳ Publishing...';
-            }
-          }
+        
         });
       }
     });
