@@ -11,6 +11,15 @@ $sql = "SELECT * FROM reports";
 $result = $conn->query($sql);
 $reports = $result->fetch_all(MYSQLI_ASSOC);
 
+
+
+
+//Fetch all user details
+$sql_users = "SELECT * FROM users"; 
+$result_users = $conn->query($sql_users);
+  $users = $result_users->fetch_all(MYSQLI_ASSOC);
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_report_status') {
 
     // Sanitize inputs
@@ -901,14 +910,14 @@ $agencies = [
                             <?php else: ?>
                             <?php foreach ($users as $user): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($user['id']); ?></td>
+                                <td><?php echo htmlspecialchars($user['User_ID']); ?></td>
                                 <td><?php echo htmlspecialchars($user['Name']); ?></td>
                                 <td><?php echo htmlspecialchars($user['Email']); ?></td>
                                 <td><?php echo htmlspecialchars($user['Role']); ?></td>
                                 <td><?php echo htmlspecialchars($user['Phone'] ?? 'N/A'); ?></td>
                                 <td><?php echo date('Y-m-d', strtotime($user['created_at'] ?? 'now')); ?></td>
                                 <td>
-                                    <button class="action-btn danger" onclick="deleteUser(<?php echo $user['id']; ?>)">
+                                    <button class="action-btn danger" onclick="deleteUser(<?php echo $user['User_ID']; ?>)">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </td>
