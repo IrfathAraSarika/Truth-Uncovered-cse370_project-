@@ -18,10 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = $_POST['status'] ?? '';
     $agency = $_POST['agency'] ?? null;
 
-    // Debugging: log inputs
-echo "<pre>";
-print_r($_POST);  // shows all POST data
-echo "</pre>";
+
 
  
 
@@ -996,7 +993,7 @@ $agencies = [
                 <button class="btn btn-primary" onclick="saveReportUpdate()">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
-                <button class="btn btn-secondary" onclick="closeModal('reportModal')">
+                <button class="btn btn-secondary" onclick="closeModal('reportUpdateModal')">
                     Cancel
                 </button>
             </div>
@@ -1149,8 +1146,9 @@ function viewReport(reportId, updateFlag = false) {
 
         function saveReportUpdate() {
             // console.log("seletedReportId",seletedReportId)
-            const status = document.getElementById('reportUpdateStatus').value;
-            const agency = document.getElementById('reportUpdateAgency').value;
+                const report = reportsData.find(r => parseInt(r.Report_ID) === parseInt(seletedReportId));
+            const status =   document.getElementById('reportUpdateStatus').value || report.Status;
+            const agency =  document.getElementById('reportUpdateAgency').value || report.AssignedAgency ;
             
             // Show loading state
             const saveBtn = event.target;
