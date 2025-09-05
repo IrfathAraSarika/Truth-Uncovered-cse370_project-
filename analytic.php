@@ -622,19 +622,20 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
         <div class="overview-grid">
             <div class="glass-card stat-card">
                 <div class="stat-icon corruption-icon">🚨</div>
-                <div class="stat-number" id="corruption-count"><?php echo number_format($analyticsData['corruption']['total_cases']); ?></div>
+                <div class="stat-number" id="corruption-count"><?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 1")->fetch_row()[0] ?>
+                   </div>
                 <div class="stat-label">Corruption Cases</div>
             </div>
             
             <div class="glass-card stat-card">
                 <div class="stat-icon dowry-icon">💍</div>
-                <div class="stat-number" id="dowry-count"><?php echo number_format($analyticsData['dowry']['total_cases']); ?></div>
+                <div class="stat-number" id="dowry-count"><?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 5")->fetch_row()[0] ?></div>
                 <div class="stat-label">Dowry Cases</div>
             </div>
             
             <div class="glass-card stat-card">
                 <div class="stat-icon antisocial-icon">⚠️</div>
-                <div class="stat-number" id="antisocial-count"><?php echo number_format($analyticsData['antisocial']['total_cases']); ?></div>
+                <div class="stat-number" id="antisocial-count"><?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 2")->fetch_row()[0] ?></div>
                 <div class="stat-label">Antisocial Behavior</div>
             </div>
             
@@ -937,11 +938,11 @@ $totalCases = array_sum(array_column($analyticsData, 'total_cases'));
         document.addEventListener('DOMContentLoaded', function() {
             // Animate counters
             setTimeout(() => {
-                animateCounter(document.getElementById('corruption-count'), <?php echo $analyticsData['corruption']['total_cases']; ?>);
-                animateCounter(document.getElementById('dowry-count'), <?php echo $analyticsData['dowry']['total_cases']; ?>);
-                animateCounter(document.getElementById('antisocial-count'), <?php echo $analyticsData['antisocial']['total_cases']; ?>);
-                animateCounter(document.getElementById('hazards-count'), <?php echo $analyticsData['hazards']['total_cases']; ?>);
-                animateCounter(document.getElementById('harassment-count'), <?php echo $analyticsData['harassment']['total_cases']; ?>);
+                animateCounter(document.getElementById('corruption-count'), <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 1")->fetch_row()[0] ?>);
+                animateCounter(document.getElementById('dowry-count'),<?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 5")->fetch_row()[0] ?>);
+                animateCounter(document.getElementById('antisocial-count'), <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 2")->fetch_row()[0] ?>);
+                animateCounter(document.getElementById('hazards-count'), <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 3")->fetch_row()[0] ?>);
+                animateCounter(document.getElementById('harassment-count'), <?= $conn->query("SELECT COUNT(*) FROM reports WHERE Category_ID = 4")->fetch_row()[0] ?>);
             }, 500);
 
             // Initialize charts
