@@ -19,7 +19,7 @@ $sql_users = "SELECT * FROM users";
 $result_users = $conn->query($sql_users);
   $users = $result_users->fetch_all(MYSQLI_ASSOC);
 
-
+//Update action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_report_status') {
 
     // Sanitize inputs
@@ -27,9 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = $_POST['status'] ?? '';
     $agency = $_POST['agency'] ?? null;
 
-
-
- 
 
     // Prepare and execute update
     $stmt = $conn->prepare("UPDATE reports SET Status = ?, AssignedAgency = ? WHERE Report_ID = ?");
@@ -49,8 +46,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         error_log("Execute failed: " . $stmt->error);
     }
 
-  
 }
+
+
+//User dele action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteUserId'])) {
+    $userId = intval($_POST['deleteUserId']); // sanitize input
+
+    $sql = "DELETE FROM users WHERE User_ID = $userId LIMIT 1";
+    if ($conn->query($sql)) {
+        echo "User deleted successfully.";
+    } else {
+        echo "Error deleting user: " . $conn->error;
+    }
+    exit;
+}
+
 // Sample agencies list
 $agencies = [
     ['id' => 1,  'name' => 'Anti-Corruption Commission (Government)'],
@@ -1286,13 +1297,28 @@ function viewReport(reportId, updateFlag = false) {
         }
 
         // User functions
-        function deleteUser(userId) {
-            deleteAction = 'user';
-            deleteId = userId;
-            document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete this user? This action cannot be undone.';
-            document.getElementById('confirmDeleteBtn').onclick = confirmDelete;
-            openModal('deleteModal');
-        }
+function deleteUser(userId) {
+    document.getElementById('deleteMessage').textContent =
+        'Are you sure you want to delete this user? This action cannot be undone.';
+
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Send AJAX POST request back to the same page
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'deleteUserId=' + encodeURIComponent(userId)
+        })
+        .then(response => response.text())
+        .then(data => {
+          
+            location.reload(); // reload page to reflect changes
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+    openModal('deleteModal');
+}
+
 
         // Blog functions
         function viewBlog(blogId) {
