@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 
-//User dele action
+//User delete action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteUserId'])) {
     $userId = intval($_POST['deleteUserId']); // sanitize input
 
@@ -64,6 +64,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteUserId'])) {
         echo "User deleted successfully.";
     } else {
         echo "Error deleting user: " . $conn->error;
+    }
+    exit;
+}
+
+        
+//blog delete action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteBlogId'])) {
+    $blogId = intval($_POST['deleteBlogId']); // sanitize input
+
+    $sql = "DELETE FROM blogposts WHERE Post_ID =   $blogId LIMIT 1";
+    if ($conn->query($sql)) {
+        echo "Blog deleted successfully.";
+    } else {
+        echo "Error deleting blog: " . $conn->error;
     }
     exit;
 }
@@ -1362,33 +1376,44 @@ function deleteUser(userId) {
 
 
         // Blog functions
-        function viewBlog(blogId) {
-              currentBlogId = blogId;
+ function viewBlog(blogId) {
+    currentBlogId = blogId;
 
     // Find the report in the reportsData array
     const report = blogsData.find(r => parseInt(r.Post_ID) === parseInt(currentBlogId));
-
     console.log("report data:",report)
     if (!report) {
         alert("Report not found");
         return;
     }
-
     // Populate modal content
    document.getElementById('blogReportTitle').innerText = report.Title || 'Untitled';
     document.getElementById('blogReportDescription').innerText = report.Content || 'No description provided';
     document.getElementById('blogReportReporter').innerText = report.Author_ID || 'Anonymous'; // Or map to username
     document.getElementById('blogReportStatus').innerText = report.Status || 'N/A';
-   
-        openModal('blogReportModal');
+     openModal('blogReportModal');
     
         }
 
-        function deleteBlog(blogId) {
+  function deleteBlog(blogId) {
             deleteAction = 'blog';
             deleteId = blogId;
-            document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete this blog post? This action cannot be undone.';
-            document.getElementById('confirmDeleteBtn').onclick = confirmDelete;
+            document.getElementById('deleteMessage').textContent = 'Are you sure you want to delete this blog post?';
+             document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Send AJAX POST request back to the same page
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'deleteBlogId=' + encodeURIComponent(deleteId)
+        })
+        .then(response => response.text())
+        .then(data => {
+            showNotification('Report deleted successfully!', 'success');
+            location.reload();
+        })
+        .catch(error => console.error('Error:', error));
+    };
+           
             openModal('deleteModal');
         }
 
