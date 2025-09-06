@@ -13,13 +13,12 @@ function h($v) {
 
 // Category options
 $defaults = [
-    'corruption' => 'Corruption & Bribery',
-    'harassment' => 'Harassment & Abuse',
-    'infrastructure' => 'Infrastructure Issues',
-    'education' => 'Education System',
-    'healthcare' => 'Healthcare',
-    'environment' => 'Environmental Issues',
-    'other' => 'Other',
+    'Corruption' => 'Corruption & Bribery',
+    'Harassment' => 'Harassment & Abuse',
+    'Public Hazards' => 'Public Hazards',
+    'Antisocial Behavior' => 'Antisocial Behavior',
+    'Dowry Violence' => 'Dowry Violence',
+ 
 ];
 
 // Create the table if it doesn't exist (add Category column)

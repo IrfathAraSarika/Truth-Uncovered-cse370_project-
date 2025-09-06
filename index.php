@@ -34,9 +34,7 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-
-
-
+//Fetching Reports 
 
 $sql_reports = "SELECT * FROM reports";
 $result_reports = $conn->query($sql_reports);
@@ -56,6 +54,29 @@ if ($result_reports) {
 } else {
     echo "<script>console.error('Query failed: " . $conn->error . "');</script>";
 }
+
+//Fetching Blogpost
+$sql_blogposts = "SELECT * FROM blogposts";
+$result_blogposts = $conn->query($sql_blogposts);
+
+if ($result_blogposts) {
+    // Count total posts
+    $post_count = $result_blogposts->num_rows;
+
+    // Fetch all posts as associative array
+    $blogposts = $result_blogposts->fetch_all(MYSQLI_ASSOC);
+
+    // Pass to JavaScript for use in frontend
+    echo "<script>
+        console.log('Total blog posts: ' + $post_count);
+        console.log(" . json_encode($blogposts) . ");
+    </script>";
+} else {
+    echo "<script>console.error('Query failed: " . $conn->error . "');</script>";
+}
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -1261,43 +1282,29 @@ if (!empty($_SESSION['notification'])): ?>
         <!-- Impact Stories Section -->
         <section class="glass-widget" style="margin: 3rem 0;">
             <h3 class="widget-title">🌟 Success Stories & Real Impact</h3>
-            <div class="story-carousel">
-                <div class="story-card">
-                    <div class="story-title">Hospital Corruption Exposed</div>
-                    <div class="story-outcome">
-                        A citizen's report led to the investigation of a major hospital corruption scandal. 
-                        Five officials were arrested, $2.1M in misappropriated funds recovered, and hospital 
-                        services improved for over 50,000 patients in the Dhaka region.
-                    </div>
-                    <div class="story-date">Published: Aug 15, 2025</div>
+     <div class="story-carousel">
+    <?php
+    $sql_blogposts = "SELECT * FROM blogposts ORDER BY Date_Published DESC";
+    $result_blogposts = $conn->query($sql_blogposts);
+
+    if ($result_blogposts && $result_blogposts->num_rows > 0) {
+        while ($post = $result_blogposts->fetch_assoc()) {
+            ?>
+            <div class="story-card">
+                <div class="story-title"><?php echo htmlspecialchars($post['Title']); ?></div>
+                <div class="story-outcome">
+                    <?php echo nl2br(htmlspecialchars($post['Content'])); ?>
                 </div>
-                <div class="story-card">
-                    <div class="story-title">Environmental Violation Stopped</div>
-                    <div class="story-outcome">
-                        Industrial waste dumping into the Buriganga River was halted after a whistleblower's 
-                        evidence. The company faced legal action, cleanup operations began, and 12 communities 
-                        now have access to cleaner water.
-                    </div>
-                    <div class="story-date">Published: Aug 10, 2025</div>
-                </div>
-                <div class="story-card">
-                    <div class="story-title">Education Fund Recovery</div>
-                    <div class="story-outcome">
-                        School board corruption exposed through our platform resulted in the recovery of 
-                        ৳15 lakh in education funds. A new oversight committee was established to prevent 
-                        future misconduct.
-                    </div>
-                    <div class="story-date">Published: Aug 5, 2025</div>
-                </div>
-                <div class="story-card">
-                    <div class="story-title">Workplace Safety Improved</div>
-                    <div class="story-outcome">
-                        Anonymous report about unsafe working conditions led to factory inspection and 
-                        mandatory safety upgrades, protecting 300+ garment workers from potential hazards.
-                    </div>
-                    <div class="story-date">Published: Jul 28, 2025</div>
-                </div>
+                <div class="story-date">Published: <?php echo htmlspecialchars($post['Date_Published']); ?></div>
             </div>
+            <?php
+        }
+    } else {
+        echo "<p>No blog posts found.</p>";
+    }
+    ?>
+</div>
+
         </section>
 
 
