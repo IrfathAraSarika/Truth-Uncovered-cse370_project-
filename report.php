@@ -44,7 +44,7 @@ function createReport($conn, $data, $files) {
         if (!$stmt) die("Prepare failed: " . $conn->error);
 
         $stmt->bind_param(
-            "sssssssiiss",
+            "sssssisiss",
             $data['title'],
             $data['description'],
             $data['address'],
