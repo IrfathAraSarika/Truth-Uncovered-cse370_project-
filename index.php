@@ -1137,7 +1137,7 @@ if (!empty($_SESSION['notification'])): ?>
         <!-- Dashboard Widgets -->
         <div class="dashboard-grid fade-in-delay">
             <!-- Recent Reports -->
-            <div class="glass-widget">
+            <!-- <div class="glass-widget">
                 <h3 class="widget-title">📄 Your Recent Reports</h3>
                 <div class="report-item">
                     <div class="report-title">Unauthorized Construction in Protected Area</div>
@@ -1145,15 +1145,15 @@ if (!empty($_SESSION['notification'])): ?>
                         <span>Aug 25, 2025</span>
                         <span class="status-badge status-verified">Verified</span>
                     </div>
-                </div>
-                <div class="report-item">
+                </div> -->
+                <!-- <div class="report-item">
                     <div class="report-title">Public Fund Misuse in Education Sector</div>
                     <div class="report-meta">
                         <span>Aug 20, 2025</span>
                         <span class="status-badge status-pending">Under Review</span>
                     </div>
-                </div>
-                <div class="report-item">
+                </div> -->
+                <!-- <div class="report-item">
                     <div class="report-title">Workplace Harassment at Government Office</div>
                     <div class="report-meta">
                         <span>Aug 15, 2025</span>
@@ -1161,7 +1161,7 @@ if (!empty($_SESSION['notification'])): ?>
                     </div>
                 </div>
                 <button class="action-button primary-button">View All Reports</button>
-            </div>
+            </div> -->
 
             <!-- Analytics Dashboard -->
             <div class="glass-widget">
