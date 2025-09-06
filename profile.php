@@ -32,19 +32,20 @@ $result_report = $stmt->get_result();
 
 $reports = $result_report->fetch_all(MYSQLI_ASSOC);
 
-echo "<script>console.log(" . json_encode($reports) . ");</script>";
 
-// Handle profile update if POST data is sent
-$input = json_decode(file_get_contents('php://input'), true);
-error_log(print_r($input, true));
+
+
 
 $sub_sms   = !empty($input['smsNotification'])   && $input['smsNotification']   == 1 ? 1 : 0;
 $sub_email = !empty($input['emailNotification']) && $input['emailNotification'] == 1 ? 1 : 0;
 $sub_blog  = !empty($input['blogNotifation'])    && $input['blogNotifation']    == 1 ? 1 : 0;
 
-
+// Handle profile update if POST data is sent
+$input = json_decode(file_get_contents('php://input'), true);
+error_log(print_r($input, true));
 
 if ($input) {
+        header('Content-Type: application/json; charset=utf-8');
     $sql = "UPDATE Users SET 
         Name = ?, 
         Email = ?, 
@@ -1203,17 +1204,22 @@ console.log ("Profile data from edit", JSON.stringify(profileData))
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profileData)
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('userName').textContent = profileData.name;
-            updateFieldValues();
-            showNotification('Profile updated successfully!', 'success');
-            closeModal();
-        } else {
-            showNotification('Error: ' + data.message, 'error');
-        }
-    })
+ .then(async res => {
+    const text = await res.text();
+    console.log("Raw response:", text);
+    return JSON.parse(text);
+})
+.then(data => {
+    console.log("Parsed data:", data);
+    if (data) {
+        showNotification('Profile updated successfully!', 'success');
+        document.getElementById('userName').textContent = profileData.name;
+        updateFieldValues();
+        closeModal();
+    } else {
+        showNotification('Error: ' + data.message, 'error');
+    }
+})
     .catch(err => console.error(err));
 }
 

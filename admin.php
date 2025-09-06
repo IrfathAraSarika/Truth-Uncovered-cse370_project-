@@ -6,6 +6,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
     header('Location: login.php');
     exit();
 }
+
+// Handle message submission
+$messageSent = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
+    $message = $conn->real_escape_string($_POST['message']);
+    if (!empty($message)) {
+        $sql = "INSERT INTO admin_messages (admin_message, created_at) VALUES ('$message', NOW())";
+        if ($conn->query($sql) === TRUE) {
+            $messageSent = "Message sent successfully!";
+        } else {
+            $messageSent = "Error: " . $conn->error;
+        }
+    } else {
+        $messageSent = "Please enter a message.";
+    }
+}
+
+
 // Fetch all users (or just the logged-in user)
 $sql = "SELECT * FROM reports";
 $result = $conn->query($sql);
@@ -159,6 +177,87 @@ $agencies = [
             background-clip: text;
             cursor:pointer;
         }
+
+
+
+        .send-btn {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+ 
+    width:100%;
+    transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59,130,246,0.5);
+}
+
+/* Popup Overlay */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15,15,35,0.8);
+    backdrop-filter: blur(10px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup Content */
+.popup-content {
+    background: rgba(30,30,30,0.95);
+    padding: 30px 40px;
+    border-radius: 20px;
+    width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+}
+
+/* Input Field */
+#messageInput {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 20px 0;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+#messageInput:focus {
+    box-shadow: 0 0 10px rgba(59,130,246,0.6);
+    background: rgba(59,130,246,0.05);
+}
 
         .nav-actions {
             display: flex;
@@ -885,6 +984,9 @@ $agencies = [
             <button class="nav-tab" onclick="switchTab('blogs')">
                 <i class="fas fa-blog"></i> Manage Blogs
             </button>
+              <button class="nav-tab" onclick="switchTab('message')">
+                <i class="fas fa-message"></i> Send Message
+            </button>
         </div>
 
         <!-- Reports Section -->
@@ -1152,7 +1254,47 @@ $agencies = [
                 </div>
             </div>
         </div>
+
+   <!-- message section  -->
+
+  <div id="message-section" class="content-section">
+    <div class="section-card">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-message"></i>
+                Send Message
+            </h2>
+        </div>
+       <div style="padding:20px;">
+<button id="openMessagePopup" class="send-btn">Create Message</button>
+       </div>
+        <!-- Send Message Button -->
+         <!-- Display feedback after submission -->
+
     </div>
+
+
+    </div>
+
+
+
+
+    <!-- Popup Modal -->
+    <div id="messagePopup" class="popup-overlay">
+        <div class="popup-content">
+            <span class="close-btn" id="closePopup">&times;</span>
+            <h3>Send a New Message</h3>
+            <form method="post" action="">
+            <input type="text" name ="message" id="messageInput" placeholder="Type your message..." />
+            <button type="submit"  id="sendMessage" class="send-btn">Send</button>
+    </form>
+        </div>
+    </div>
+</div>
+ 
+
+
+
 
     <!-- Update Modal -->
     <div id="reportUpdateModal" class="modal">
@@ -1693,6 +1835,28 @@ function deleteUser(userId) {
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Admin Dashboard initialized');
         });
+
+
+       //send message
+       // Open popup
+document.getElementById("openMessagePopup").onclick = function() {
+    document.getElementById("messagePopup").style.display = "flex";
+}
+
+// Close popup
+document.getElementById("closePopup").onclick = function() {
+    document.getElementById("messagePopup").style.display = "none";
+}
+
+// Send Message (example alert)
+
+<?php if(!empty($messageSent)): ?>
+    // Call your notification function
+    showNotification("<?php echo addslashes($messageSent); ?>");
+<?php endif; ?>
+
+
+
     </script>
 </body>
 </html>

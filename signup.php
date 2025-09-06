@@ -534,7 +534,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <!-- Message Display -->
-            <div id="messageContainer" style="display: none;"></div>
+            <!-- <div id="messageContainer" style="display: none;"></div> -->
 
             <!-- Signup Form -->
             <form method="POST" action="" id="signupForm">
@@ -841,6 +841,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     strength === 2 ? '234, 179, 8' : '34, 197, 94'}, 0.5)`;
             }
         }
+
+
+ function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : 
+                           type === 'error' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 
+                           'linear-gradient(135deg, #3b82f6, #1d4ed8)'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Send Message (example alert)
+
+<?php if(!empty($success)): ?>
+    // Call your notification function
+    showNotification("<?php echo addslashes($success); ?>");
+<?php endif; ?>
     </script>
 </body>
 </html>

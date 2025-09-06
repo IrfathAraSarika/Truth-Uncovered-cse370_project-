@@ -76,6 +76,22 @@ if ($result_blogposts) {
 }
 
 
+//fetch all notification
+$messages = [];
+$sql_messages = "SELECT * FROM admin_messages ORDER BY created_at DESC";
+$result_messages = $conn->query($sql_messages);
+$message_count=$result_messages->num_rows;
+if ($result_messages && $result_messages->num_rows > 0) {
+    while ($row = $result_messages->fetch_assoc()) {
+        $messages[] = $row;
+    }
+}
+    echo "<script>
+        console.log('Total messsage: ' + $message_count);
+        console.log(" . json_encode($messages ) . ");
+    </script>";
+
+
 
 ?>
 
@@ -1063,7 +1079,7 @@ if ($result_blogposts) {
    <?php if (isset($_SESSION['role']) && $_SESSION['role'] !== 'Admin'): ?>
             <button class="notification-badge" onclick="toggleNotifications()">
                 🔔
-                <span class="badge-count" id="notificationCount">3</span>
+                <span class="badge-count" id="notificationCount"><?php echo count($messages); ?></span>
             </button>
                 <?php endif; ?>
             
@@ -1347,26 +1363,24 @@ if (!empty($_SESSION['notification'])): ?>
     </main>
 
     <!-- Notification Panel -->
-    <div id="notificationPanel" style="display: none; position: fixed; top: 80px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); padding: 1.5rem; min-width: 320px; z-index: 1000;">
+    <div id="notificationPanel" style="display: none; position: fixed; top: 80px; right: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); padding: 1.5rem; min-width: 320px; z-index: 1000;max-height:300px; overflow-y:auto;">
         <h4 style="margin-bottom: 1rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
             🔔 Recent Notifications
         </h4>
+    <?php if (!empty($messages)): ?>
+    <?php foreach ($messages as $msg): ?>
         <div style="border-bottom: 1px solid rgba(0,0,0,0.1); padding: 1rem 0;">
-            <div style="font-weight: 600; color: #1f2937;">Case Update</div>
-            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 0.3rem;">Your report #CR-2025-089 has been verified and forwarded to authorities</div>
-            <div style="font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">2 hours ago</div>
+            <div style="font-weight: 600; color: #1f2937;"> Admin Message</div>
+            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 0.3rem;">
+                <?php echo htmlspecialchars($msg['admin_message']); ?>
+            </div>
+            <div style="font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">
+                <?php echo date("M d, Y H:i", strtotime($msg['created_at'])); ?>
+            </div>
         </div>
-        <div style="border-bottom: 1px solid rgba(0,0,0,0.1); padding: 1rem 0;">
-            <div style="font-weight: 600; color: #1f2937;">New Blog Post</div>
-            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 0.3rem;">Understanding Your Legal Rights as a Whistleblower</div>
-            <div style="font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">1 day ago</div>
-        </div>
-        <div style="padding: 1rem 0;">
-            <div style="font-weight: 600; color: #1f2937;">System Update</div>
-            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 0.3rem;">Enhanced security features and improved anonymization</div>
-            <div style="font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">3 days ago</div>
-        </div>
-        <button style="width: 100%; padding: 0.8rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; border: none; border-radius: 12px; margin-top: 1rem; cursor: pointer; font-weight: 500;">View All Notifications</button>
+    <?php endforeach; ?>
+<?php endif; ?>
+
     </div>
 <!-- 
 
@@ -1537,17 +1551,7 @@ window.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        // Simulate real-time updates
-        setInterval(() => {
-            const count = document.getElementById('notificationCount');
-            const currentCount = parseInt(count.textContent);
-            
-            // Randomly update notification count (simulation)
-            if (Math.random() < 0.1) { // 10% chance every 5 seconds
-                count.textContent = currentCount + 1;
-                count.style.animation = 'bounce 0.6s ease-out';
-            }
-        }, 5000);
+
 
         // Add CSS animations
         const style = document.createElement('style');
