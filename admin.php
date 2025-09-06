@@ -462,6 +462,50 @@ $agencies = [
   border-bottom: 2px solid #3b82f6; /* blue bottom border */
   box-shadow: 0 2px 6px -2px rgba(59, 130, 246, 0.7); /* subtle glow */
 }
+
+#userSearch {
+  width: 500px; /* fixed width */
+  padding: 0.6rem;
+  border: none;
+  border-bottom: 2px solid #ccc; /* only bottom border */
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+
+  outline: none; /* remove default blue outline */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#userSearch:focus {
+  border-bottom: 2px solid #3b82f6; /* blue bottom border */
+  box-shadow: 0 2px 6px -2px rgba(59, 130, 246, 0.7); /* subtle glow */
+}
+
+
+
+
+
+#blogSearch {
+  width: 500px; /* fixed width */
+  padding: 0.6rem;
+  border: none;
+  border-bottom: 2px solid #ccc; /* only bottom border */
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+
+  outline: none; /* remove default blue outline */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#blogSearch:focus {
+  border-bottom: 2px solid #3b82f6; /* blue bottom border */
+  box-shadow: 0 2px 6px -2px rgba(59, 130, 246, 0.7); /* subtle glow */
+}
+
+
+
+
         /* Content Sections */
         .content-section {
             display: none;
@@ -927,6 +971,9 @@ $agencies = [
                         User Management
                     </h2>
                 </div>
+                 <div class="search-container">
+  <input type="text" id="userSearch" placeholder="Search users...">
+</div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1012,7 +1059,11 @@ $agencies = [
                         <i class="fas fa-blog"></i>
                         Blog Management
                     </h2>
+ 
                 </div>
+ <div class="search-container">
+  <input type="text" id="blogSearch" placeholder="Search blogs...">
+</div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -1284,6 +1335,30 @@ $agencies = [
     row.style.display = text.includes(value) ? "" : "none";
   });
 });
+        
+
+//blog search
+     //report search 
+        document.getElementById("blogSearch").addEventListener("keyup", function () {
+  let value = this.value.toLowerCase();
+  let rows = document.querySelectorAll("#blogs-table-body tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(value) ? "" : "none";
+  });
+});
+//user search
+        document.getElementById("userSearch").addEventListener("keyup", function () {
+  let value = this.value.toLowerCase();
+  let rows = document.querySelectorAll("#users-table-body tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(value) ? "" : "none";
+  });
+});
+
 
         // Report functions
 function viewReport(reportId, updateFlag = false) {
