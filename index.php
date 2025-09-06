@@ -91,7 +91,11 @@ if ($result_blogposts) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            
         }
+        html {
+    scroll-behavior: smooth;
+}
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1080,7 +1084,7 @@ if (!empty($_SESSION['notification'])): ?>
     <div id="toast" class="toast error"><?= $error ?></div>
 <?php endif; ?>
         <!-- About Section - First Thing Users See -->
-        <section class="about-section">
+        <section class="about-section" id="top-section">
             <div class="about-content">
                 <h1 class="about-title">Truth Uncovered</h1>
                 <p class="about-subtitle">Empowering Bangladeshi Citizens Through Digital Civic Engagement</p>
@@ -1094,19 +1098,15 @@ if (!empty($_SESSION['notification'])): ?>
                         <div class="feature-title">Anonymous Reporting</div>
                         <div class="feature-desc">Complete privacy protection with end-to-end encryption</div>
                     </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">⚡</span>
-                        <div class="feature-title">Fast Response</div>
-                        <div class="feature-desc">24-hour average response time to all reports</div>
-                    </div>
-                    <div class="feature-item">
+               
+                    <div class="feature-item"  onclick="location.href='#protection'">
                         <span class="feature-icon">🛡️</span>
                         <div class="feature-title">Legal Protection</div>
-                        <div class="feature-desc">Whistleblower protection under Bangladesh law</div>
+                        <div class="feature-desc">Protection under Bangladesh law</div>
                     </div>
-                    <div class="feature-item">
+                    <div class="feature-item"  onclick="location.href='#analytic'">
                         <span class="feature-icon">📈</span>
-                        <div class="feature-title">Real Impact</div>
+                        <div class="feature-title">Analytics</div>
                         <div class="feature-desc">89% resolution rate with measurable outcomes</div>
                     </div>
                 </div>
@@ -1209,8 +1209,8 @@ if (!empty($_SESSION['notification'])): ?>
             </div> -->
 
             <!-- Analytics Dashboard -->
-            <div class="glass-widget">
-                <h3 class="widget-title">📊 Platform Analytics</h3>
+            <div class="glass-widget" id="analytic">
+                <h3 class="widget-title" >📊 Platform Analytics</h3>
                 <div class="analytics-grid">
                     <div class="metric-card">
                         <div class="metric-value"> <?php echo count($reports); ?></div>
@@ -1246,7 +1246,7 @@ if (!empty($_SESSION['notification'])): ?>
             </div>
 
             <!-- Institution Rankings -->
-            <div class="glass-widget">
+            <div class="glass-widget" >
                 <h3 class="widget-title">🏢 Institution Trust Rankings</h3>
                 <div class="ranking-item">
                     <div>
@@ -1307,159 +1307,7 @@ if (!empty($_SESSION['notification'])): ?>
 
         </section>
 
-
-
-  
-
-
-
- 
-
-        <!-- Advanced Case Management -->
-        <!-- <section class="glass-widget">
-            <h3 class="widget-title">📋 Case Management Dashboard</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                <!-- Active Cases -->
-                <!-- <div>
-                    <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">🔄 Active Cases</h4>
-                    <div class="report-item">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                            <div class="report-title">Case #CR-2025-089</div>
-                            <span class="status-badge status-verified">Investigating</span>
-                        </div>
-                        <div style="color: #cbd5e1; font-size: 0.9rem;">Construction permit violation</div>
-                        <div style="margin-top: 0.8rem;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.3rem;">
-                                <span>Progress</span>
-                                <span>75%</span>
-                            </div>
-                            <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden;">
-                                <div style="background: linear-gradient(135deg, #10b981, #059669); height: 6px; width: 75%; border-radius: 10px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                            <div class="report-title">Case #CR-2025-076</div>
-                            <span class="status-badge status-pending">Pending Review</span>
-                        </div>
-                        <div style="color: #cbd5e1; font-size: 0.9rem;">Educational fund misuse</div>
-                        <div style="margin-top: 0.8rem;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.3rem;">
-                                <span>Progress</span>
-                                <span>25%</span>
-                            </div>
-                            <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden;">
-                                <div style="background: linear-gradient(135deg, #f59e0b, #d97706); height: 6px; width: 25%; border-radius: 10px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- Case Status Updates -->
-                <!-- <div>
-                    <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📢 Recent Updates</h4>
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
-                        <div style="font-weight: 600; color: #10b981; margin-bottom: 0.5rem;">✅ Case Resolved</div>
-                        <div style="color: #cbd5e1; font-size: 0.9rem;">Hospital corruption case led to arrests and fund recovery</div>
-                        <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.5rem;">2 hours ago</div>
-                    </div>
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
-                        <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.5rem;">🔍 Investigation Started</div>
-                        <div style="color: #cbd5e1; font-size: 0.9rem;">Environmental violation report assigned to investigation team</div>
-                        <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.5rem;">5 hours ago</div>
-                    </div>
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1rem;">
-                        <div style="font-weight: 600; color: #f59e0b; margin-bottom: 0.5rem;">⏳ Under Review</div>
-                        <div style="color: #cbd5e1; font-size: 0.9rem;">New workplace harassment case submitted for initial review</div>
-                        <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.5rem;">1 day ago</div>
-                    </div>
-                </div>
-            </div>
-            <button class="action-button primary-button">View Detailed Case Dashboard</button>
-        </section> --> -->
-
-    
-
-        <!-- Regional Performance & Institution Rankings -->
-        <!-- <section class="glass-widget">
-            <h3 class="widget-title">🌍 Regional Performance & Institution Rankings</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                Regional Performance -->
-                <!-- <div>
-                    <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📍 Regional Performance</h4>
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                            <span style="color: #ffffff; font-weight: 600;">Dhaka Division</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="background: #ef4444; width: 12px; height: 12px; border-radius: 50%;"></div>
-                                <span style="color: #ef4444; font-weight: 600;">High Activity</span>
-                            </div>
-                        </div>
-                        <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem;">
-                            <div style="background: linear-gradient(135deg, #ef4444, #dc2626); height: 6px; width: 85%;"></div>
-                        </div>
-                        <div style="color: #cbd5e1; font-size: 0.8rem;">342 reports • 78% resolution rate</div>
-                    </div>
-                    
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                            <span style="color: #ffffff; font-weight: 600;">Chittagong Division</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="background: #f59e0b; width: 12px; height: 12px; border-radius: 50%;"></div>
-                                <span style="color: #f59e0b; font-weight: 600;">Medium Activity</span>
-                            </div>
-                        </div>
-                        <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem;">
-                            <div style="background: linear-gradient(135deg, #f59e0b, #d97706); height: 6px; width: 60%;"></div>
-                        </div>
-                        <div style="color: #cbd5e1; font-size: 0.8rem;">198 reports • 82% resolution rate</div>
-                    </div>
-                    
-                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1.2rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                            <span style="color: #ffffff; font-weight: 600;">Sylhet Division</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div style="background: #10b981; width: 12px; height: 12px; border-radius: 50%;"></div>
-                                <span style="color: #10b981; font-weight: 600;">Low Activity</span>
-                            </div>
-                        </div>
-                        <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem;">
-                            <div style="background: linear-gradient(135deg, #10b981, #059669); height: 6px; width: 35%;"></div>
-                        </div>
-                        <div style="color: #cbd5e1; font-size: 0.8rem;">87 reports • 91% resolution rate</div>
-                    </div>
-                </div> -->
-
-                <!-- Enhanced Institution Rankings -->
-                <!-- <div>
-                    <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">🏛️ Institution Trust Scores</h4>
-                    <div class="ranking-item">
-                        <div>
-                            <div style="font-weight: 600; color: #ffffff;">Anti-Corruption Commission</div>
-                            <div style="font-size: 0.8rem; color: #94a3b8;">Government Agency • 2,341 interactions</div>
-                            <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem;">
-                                <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem;">Responsive</span>
-                                <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem;">Transparent</span>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="trust-score">8.5/10</div>
-                            <div style="color: #10b981; font-size: 0.8rem; margin-top: 0.3rem;">↗️ +0.3</div>
-                        </div>
-                    </div>
-                    
-                    <div class="ranking-item">
-                        <div>
-                            <div style="font-weight: 600; color: #ffffff;">Bangladesh Police</div>
-                            <div style="font-size: 0.8rem; color: #94a3b8;">Law Enforcement • 1,876 interactions</div>
-                            <div style="display: flex; gap: 0.5rem; margin-top: 0.3rem;">
-                                <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem;">Slow Response</span>
-                                <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem;">Improving</span>
-             
-</section> -->
-    <!-- Whistleblower Protection Center -->
-        <section class="glass-widget">
+        <section class="glass-widget" id="protection" onclick="window.location.href='#top-section'">
         
             <div style="margin-top: 1.5rem; padding: 1.2rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px;">
                 <div style="color: #ffffff; font-weight: 600; margin-bottom: 0.8rem;">📞 Emergency Support</div>
@@ -1499,7 +1347,7 @@ if (!empty($_SESSION['notification'])): ?>
     </div> -->
 
     <!-- Emergency Report Modal -->
-    <div id="emergencyModal" class="modal">
+    <div id="emergencyModal" class="modal" onclick="location.href='#top-section'">
         <div class="modal-content" style="border: 2px solid rgba(239, 68, 68, 0.3);">
             <button class="close-button" onclick="closeModal('emergencyModal')">&times;</button>
             <h3 style="margin-bottom: 1rem; color: #ef4444; font-size: 1.5rem; font-weight: 700;">🚨 Emergency Report</h3>
