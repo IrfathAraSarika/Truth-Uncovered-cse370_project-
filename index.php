@@ -1342,7 +1342,8 @@ if (!empty($_SESSION['notification'])): ?>
             <?php
         }
     } else {
-        echo "<p>No blog posts found.</p>";
+       echo '<p style="color:white; text-align:center;">No blog posts found.</p>';
+
     }
     ?>
 </div>

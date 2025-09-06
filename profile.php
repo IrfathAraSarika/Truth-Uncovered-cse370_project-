@@ -23,6 +23,7 @@ if ($result->num_rows === 1) {
 }
 
 
+
 // Fetch reports only for the logged-in user
 $sql_report = "SELECT * FROM reports WHERE User_ID = ?";
 $stmt = $conn->prepare($sql_report);
@@ -36,12 +37,12 @@ $reports = $result_report->fetch_all(MYSQLI_ASSOC);
 
 
 
-$sub_sms   = !empty($input['smsNotification'])   && $input['smsNotification']   == 1 ? 1 : 0;
-$sub_email = !empty($input['emailNotification']) && $input['emailNotification'] == 1 ? 1 : 0;
-$sub_blog  = !empty($input['blogNotifation'])    && $input['blogNotifation']    == 1 ? 1 : 0;
 
 // Handle profile update if POST data is sent
 $input = json_decode(file_get_contents('php://input'), true);
+$sub_sms = !empty($input['smsNotification'])   && $input['smsNotification']   == 1 ? 1 : 0;
+$sub_email= !empty($input['emailNotification']) && $input['emailNotification'] == 1 ? 1 : 0;
+$sub_blog= !empty($input['blogNotifation'])    && $input['blogNotifation']    == 1 ? 1 : 0;
 error_log(print_r($input, true));
 
 if ($input) {
@@ -1099,8 +1100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button class="primary-button" onclick="updatePassword()" style="flex: 1;">Update Password</button>
-                <button class="action-button" onclick="closePasswordModal()" style="flex: 1;">Cancel</button>
+                <button class="primary-button" onclick="updatePassword()" style="flex: 1;color:white;border-radius:10px;">Update Password</button>
+                <button class="action-button" onclick="closePasswordModal()" style="flex: 1;color:black; justify-content:center;">Cancel</button>
             </div>
         </div>
     </div>

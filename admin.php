@@ -1091,45 +1091,9 @@ $agencies = [
                         </thead>
                         <tbody id="users-table-body">
                             <?php if (empty($users)): ?>
-                            <tr>
-                                <td>001</td>
-                                <td>John Smith</td>
-                                <td>john.smith@email.com</td>
-                                <td>Citizen</td>
-                                <td>+1-555-0101</td>
-                                <td>2024-01-10</td>
-                                <td>
-                                    <button class="action-btn danger" onclick="deleteUser(1)">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Sarah Johnson</td>
-                                <td>sarah.j@email.com</td>
-                                <td>NGO_Partner</td>
-                                <td>+1-555-0102</td>
-                                <td>2024-01-08</td>
-                                <td>
-                                    <button class="action-btn danger" onclick="deleteUser(2)">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Mike Wilson</td>
-                                <td>mike.w@email.com</td>
-                                <td>Govt_Officer</td>
-                                <td>+1-555-0103</td>
-                                <td>2024-01-05</td>
-                                <td>
-                                    <button class="action-btn danger" onclick="deleteUser(3)">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
+                                  <tr>
+                            <td colspan="7" style="text-align:center;">No users found</td>
+                        </tr>
                             <?php else: ?>
                             <?php foreach ($users as $user): ?>
                             <tr>
@@ -1181,54 +1145,9 @@ $agencies = [
                         </thead>
                         <tbody id="blogs-table-body">
                             <?php if (empty($blogs)): ?>
-                            <tr>
-                                <td>001</td>
-                                <td>Fighting Corruption: A Citizen's Guide</td>
-                                <td>Admin User</td>
-                                <td>Guide</td>
-                                <td>Published</td>
-                                <td>2024-01-12</td>
-                                <td>
-                                    <button class="action-btn" onclick="viewBlog(1)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn danger" onclick="deleteBlog(1)">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Recent Investigation Results</td>
-                                <td>Investigation Team</td>
-                                <td>News</td>
-                                <td>Published</td>
-                                <td>2024-01-11</td>
-                                <td>
-                                    <button class="action-btn" onclick="viewBlog(2)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn danger" onclick="deleteBlog(2)">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>How to Report Anonymously</td>
-                                <td>Support Team</td>
-                                <td>Tutorial</td>
-                                <td>Draft</td>
-                                <td>2024-01-09</td>
-                                <td>
-                                    <button class="action-btn" onclick="viewBlog(3)">
-                                        <i class="fas fa-eye"></i> View
-                                    </button>
-                                    <button class="action-btn danger" onclick="deleteBlog(3)">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
+                           <tr>
+                            <td colspan="7" style="text-align:center;">No blogs found</td>
+                        </tr>
                             <?php else: ?>
                             <?php foreach ($blogs as $blog): ?>
                             <tr>
