@@ -1285,11 +1285,11 @@ if (!empty($_SESSION['notification'])): ?>
  
 
         <!-- Advanced Case Management -->
-        <section class="glass-widget">
+        <!-- <section class="glass-widget">
             <h3 class="widget-title">📋 Case Management Dashboard</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                 <!-- Active Cases -->
-                <div>
+                <!-- <div>
                     <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">🔄 Active Cases</h4>
                     <div class="report-item">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
@@ -1323,10 +1323,10 @@ if (!empty($_SESSION['notification'])): ?>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Case Status Updates -->
-                <div>
+                <!-- <div>
                     <h4 style="color: #ffffff; margin-bottom: 1rem; font-weight: 600;">📢 Recent Updates</h4>
                     <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
                         <div style="font-weight: 600; color: #10b981; margin-bottom: 0.5rem;">✅ Case Resolved</div>
@@ -1346,7 +1346,7 @@ if (!empty($_SESSION['notification'])): ?>
                 </div>
             </div>
             <button class="action-button primary-button">View Detailed Case Dashboard</button>
-        </section>
+        </section> --> -->
 
     
 

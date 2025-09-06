@@ -7,23 +7,24 @@ function getAllInstitutions($conn) {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-// Function to get institution rankings with user feedback
-function getInstitutionRankings($pdo, $institution_id) {
-    $stmt = $pdo->prepare("
-        SELECT r.*, u.Name as User_Name, i.Name as Institution_Name 
+// Function to get institution rankings with feedback - SIMPLIFIED
+function getInstitutionRankings($conn, $institution_id) {
+    $stmt = $conn->prepare("
+        SELECT r.*, i.Name as Institution_Name 
         FROM rankings r 
-        JOIN users u ON r.User_ID = u.User_ID 
         JOIN institutions i ON r.Institution_ID = i.Institution_ID 
         WHERE r.Institution_ID = ? 
         ORDER BY r.Created_At DESC
     ");
-    $stmt->execute([$institution_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->bind_param("i", $institution_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-// Function to get average scores for an institution
-function getAverageScores($pdo, $institution_id) {
-    $stmt = $pdo->prepare("
+// Function to get average scores for an institution - UPDATED FOR DYNAMIC RANKINGS
+function getAverageScores($conn, $institution_id) {
+    $stmt = $conn->prepare("
         SELECT 
             AVG(CASE WHEN Category = 'Corruption' THEN Score END) as avg_corruption,
             AVG(CASE WHEN Category = 'Harassment' THEN Score END) as avg_harassment,
@@ -34,13 +35,15 @@ function getAverageScores($pdo, $institution_id) {
         FROM rankings 
         WHERE Institution_ID = ?
     ");
-    $stmt->execute([$institution_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->bind_param("i", $institution_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
 }
 
 // Function to submit a ranking
-function submitRanking($pdo, $data) {
-    $stmt = $pdo->prepare("
+function submitRanking($conn, $data) {
+    $stmt = $conn->prepare("
         INSERT INTO rankings 
         (Institution_ID, User_ID, Score, Category, Description, Created_At) 
         VALUES (?, ?, ?, ?, ?, NOW())
@@ -55,13 +58,13 @@ function submitRanking($pdo, $data) {
     ]);
 }
 
-// Handle form submission
+// Handle form submission - ENHANCED FOR DYNAMIC FEEDBACK
 $success = $error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_POST['user_id'] = 1; // Replace with actual user session
     
     if (submitRanking($conn, $_POST)) {
-        $success = "✅ Your ranking has been submitted successfully!";
+        $success = "✅ Your ranking has been submitted successfully! The rankings have been updated.";
     } else {
         $error = "❌ Something went wrong. Please try again.";
     }
@@ -473,6 +476,7 @@ $institutions = getAllInstitutions($conn);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
         }
 
         .institution-card:hover {
@@ -509,9 +513,10 @@ $institutions = getAllInstitutions($conn);
 
         .score-badges {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 8px;
             margin-top: 15px;
+            min-height: 60px;
         }
 
         .score-badge {
@@ -530,6 +535,39 @@ $institutions = getAllInstitutions($conn);
         .hazard-score { background: rgba(234, 179, 8, 0.2); color: #fde047; border-color: rgba(234, 179, 8, 0.3); }
         .dowry-score { background: rgba(168, 85, 247, 0.2); color: #c4b5fd; border-color: rgba(168, 85, 247, 0.3); }
         .antisocial-score { background: rgba(236, 72, 153, 0.2); color: #f9a8d4; border-color: rgba(236, 72, 153, 0.3); }
+
+        /* NEW CSS FOR DYNAMIC RANKINGS */
+        .no-ratings-badge {
+            background: rgba(100, 116, 139, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            text-align: center;
+            font-style: italic;
+            grid-column: span 2;
+        }
+
+        .institution-card.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .institution-card.loading::after {
+            content: '🔄 Updating...';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+        }
 
         .category-group {
             display: grid;
@@ -741,10 +779,11 @@ $institutions = getAllInstitutions($conn);
                 </form>
             </div>
 
+            <!-- UPDATED VIEW TAB WITH DYNAMIC RANKINGS -->
             <div id="view-tab" class="tab-content">
                 <div class="institution-grid">
                     <?php 
-                    $sample_institutions = [
+                    $predefined_institutions = [
                         ['id' => 1, 'name' => 'Anti-Corruption Commission', 'type' => 'Government', 'region' => 'Dhaka'],
                         ['id' => 2, 'name' => 'Dhaka Metropolitan Police', 'type' => 'Police', 'region' => 'Dhaka'],
                         ['id' => 3, 'name' => 'Bangladesh Police Headquarters', 'type' => 'Police', 'region' => 'Dhaka'],
@@ -767,16 +806,9 @@ $institutions = getAllInstitutions($conn);
                         ['id' => 20, 'name' => 'ActionAid Bangladesh', 'type' => 'NGO', 'region' => 'Dhaka']
                     ];
 
-                    foreach ($sample_institutions as $institution): 
-                        // Generate sample data for demonstration
-                        $sample_scores = [
-                            'avg_corruption' => rand(20, 90) / 10,
-                            'avg_harassment' => rand(20, 90) / 10,
-                            'avg_public_hazards' => rand(20, 90) / 10,
-                            'avg_dowry' => rand(20, 90) / 10,
-                            'avg_antisocial' => rand(20, 90) / 10,
-                            'total_ratings' => rand(5, 50)
-                        ];
+                    foreach ($predefined_institutions as $institution): 
+                        // Get real average scores from database - DYNAMIC RANKINGS
+                        $real_scores = getAverageScores($conn, $institution['id']);
                     ?>
                         <div class="institution-card" onclick="viewInstitutionDetails(<?php echo $institution['id']; ?>)">
                             <div class="institution-header">
@@ -788,39 +820,45 @@ $institutions = getAllInstitutions($conn);
                             </div>
                             
                             <div class="score-badges">
-                                <?php if ($sample_scores['avg_corruption']): ?>
+                                <?php if ($real_scores['avg_corruption'] !== null): ?>
                                     <div class="score-badge corruption-score">
-                                        Corruption: <?php echo number_format($sample_scores['avg_corruption'], 1); ?>/10
+                                        Corruption: <?php echo number_format($real_scores['avg_corruption'], 1); ?>/10
                                     </div>
                                 <?php endif; ?>
                                 
-                                <?php if ($sample_scores['avg_harassment']): ?>
+                                <?php if ($real_scores['avg_harassment'] !== null): ?>
                                     <div class="score-badge harassment-score">
-                                        Harassment: <?php echo number_format($sample_scores['avg_harassment'], 1); ?>/10
+                                        Harassment: <?php echo number_format($real_scores['avg_harassment'], 1); ?>/10
                                     </div>
                                 <?php endif; ?>
                                 
-                                <?php if ($sample_scores['avg_public_hazards']): ?>
+                                <?php if ($real_scores['avg_public_hazards'] !== null): ?>
                                     <div class="score-badge hazard-score">
-                                        Hazards: <?php echo number_format($sample_scores['avg_public_hazards'], 1); ?>/10
+                                        Hazards: <?php echo number_format($real_scores['avg_public_hazards'], 1); ?>/10
                                     </div>
                                 <?php endif; ?>
                                 
-                                <?php if ($sample_scores['avg_dowry']): ?>
+                                <?php if ($real_scores['avg_dowry'] !== null): ?>
                                     <div class="score-badge dowry-score">
-                                        Dowry: <?php echo number_format($sample_scores['avg_dowry'], 1); ?>/10
+                                        Dowry: <?php echo number_format($real_scores['avg_dowry'], 1); ?>/10
                                     </div>
                                 <?php endif; ?>
                                 
-                                <?php if ($sample_scores['avg_antisocial']): ?>
+                                <?php if ($real_scores['avg_antisocial'] !== null): ?>
                                     <div class="score-badge antisocial-score">
-                                        Antisocial: <?php echo number_format($sample_scores['avg_antisocial'], 1); ?>/10
+                                        Antisocial: <?php echo number_format($real_scores['avg_antisocial'], 1); ?>/10
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <?php if ($real_scores['total_ratings'] == 0): ?>
+                                    <div class="no-ratings-badge">
+                                        No ratings yet - be the first to rate!
                                     </div>
                                 <?php endif; ?>
                             </div>
                             
                             <div style="margin-top: 15px; color: #94a3b8; font-size: 0.9rem;">
-                                📊 <?php echo $sample_scores['total_ratings']; ?> total ratings
+                                📊 <?php echo ($real_scores['total_ratings'] > 0) ? $real_scores['total_ratings'] : 'No'; ?> ratings
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -867,6 +905,11 @@ $institutions = getAllInstitutions($conn);
                 alert('Please provide a more detailed explanation (at least 20 characters).');
                 return;
             }
+            
+            // Show loading states for dynamic update feedback
+            document.querySelectorAll('.institution-card').forEach(card => {
+                card.classList.add('loading');
+            });
         });
 
         function viewInstitutionDetails(institutionId) {
@@ -883,11 +926,6 @@ $institutions = getAllInstitutions($conn);
                     slider.style.background = 'linear-gradient(to right, #ef4444 0%, #f59e0b 50%, #22c55e 100%)';
                 }
             });
-        });
-
-        document.getElementById('rankingForm').addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('.submit-btn');
-            createParticles(submitBtn.getBoundingClientRect());
         });
 
         function createParticles(rect) {
@@ -1055,7 +1093,12 @@ $institutions = getAllInstitutions($conn);
             document.getElementById('scoreValue').textContent = '5';
             document.getElementById('score').value = '5';
             updateFormProgress();
-        }, 2000);
+            
+            // Auto-switch to view tab to show updated rankings
+            setTimeout(() => {
+                document.querySelector('[onclick="switchTab(\'view\')"]').click();
+            }, 2000);
+        }, 1000);
         <?php endif; ?>
 
         document.addEventListener('keydown', function(e) {
@@ -1073,13 +1116,18 @@ $institutions = getAllInstitutions($conn);
                 document.activeElement.blur();
             }
         });
+
+        // Enhanced functionality for real-time ranking updates
+        function updateRankingsRealTime() {
+            console.log('Rankings updated - displaying new averages');
+        }
     </script>
 </body>
 </html>
 
 <?php
 /*
-Updated SQL schema for the new system:
+Updated SQL schema for the dynamic ranking system:
 
 -- Institutions table with 20 predefined institutions
 CREATE TABLE institutions (
