@@ -439,6 +439,29 @@ $agencies = [
             color: white;
         }
 
+        .search-container {
+  margin-bottom: 1rem;
+  padding: 10px;
+  text-align: center; /* centers the input if fixed width */
+}
+
+#reportSearch {
+  width: 500px; /* fixed width */
+  padding: 0.6rem;
+  border: none;
+  border-bottom: 2px solid #ccc; /* only bottom border */
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+
+  outline: none; /* remove default blue outline */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#reportSearch:focus {
+  border-bottom: 2px solid #3b82f6; /* blue bottom border */
+  box-shadow: 0 2px 6px -2px rgba(59, 130, 246, 0.7); /* subtle glow */
+}
         /* Content Sections */
         .content-section {
             display: none;
@@ -829,6 +852,10 @@ $agencies = [
                 Reports Management
             </h2>
         </div>
+            <!-- 🔎 Search bar -->
+<div class="search-container">
+  <input type="text" id="reportSearch" placeholder="Search reports...">
+</div>
         <div class="table-container">
             <table class="data-table">
                 <thead>
@@ -1246,6 +1273,17 @@ $agencies = [
                 currentReportId = null;
             }
         }
+
+        //report search 
+        document.getElementById("reportSearch").addEventListener("keyup", function () {
+  let value = this.value.toLowerCase();
+  let rows = document.querySelectorAll("#reports-table-body tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(value) ? "" : "none";
+  });
+});
 
         // Report functions
 function viewReport(reportId, updateFlag = false) {
