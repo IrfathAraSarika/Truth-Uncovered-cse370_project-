@@ -1011,6 +1011,27 @@ if ($result_blogposts) {
             background: rgba(255, 255, 255, 0.15);
             transform: translateY(-2px);
         }
+        .user-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.user-icon {
+    font-size: 30px;
+    position: relative;
+
+}
+
+.user-icon.admin .dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background-color: green; /* or green for online */
+    border-radius: 50%;
+    border: 1px solid white; /* optional for contrast */
+}
 
     </style>
 </head>
@@ -1034,12 +1055,17 @@ if ($result_blogposts) {
                 <div class="nav-actions">
                     <a href="admin.php" class="back-button">Admin Dashboard</a>
                 </div>
+                   <div class="user-icon admin">
+            👤<span class="dot"></span>
+        </div>
             <?php endif; ?>
-
+            
+   <?php if (isset($_SESSION['role']) && $_SESSION['role'] !== 'Admin'): ?>
             <button class="notification-badge" onclick="toggleNotifications()">
                 🔔
                 <span class="badge-count" id="notificationCount">3</span>
             </button>
+                <?php endif; ?>
             
             <div class="user-info"  onclick="window.location.href='profile.php';">
                 <div class="user-name" id="userName">
