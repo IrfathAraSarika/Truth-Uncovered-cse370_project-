@@ -569,14 +569,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
 
             <!-- Social Login -->
-            <div class="social-login">
-                <button type="button" class="social-btn">
-                    <span>🔐</span> Secure ID
-                </button>
-                <button type="button" class="social-btn">
-                    <span>🛡️</span> Agent Login
-                </button>
-            </div>
+       
 
             <!-- Sign Up Link -->
             <div class="signup-link">

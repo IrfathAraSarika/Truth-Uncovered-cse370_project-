@@ -93,9 +93,58 @@ $institutions = getAllInstitutions($conn);
             background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1e3a8a 100%);
             position: relative;
             overflow-x: hidden;
-            padding: 20px;
+     
+        }
+        .container {
+            max-width:1200px;
+            margin:0 auto;
+        }
+        
+   header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+              nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+            .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor:pointer;
         }
 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+                .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
         .background-image {
             position: fixed;
             top: 0;
@@ -195,6 +244,7 @@ $institutions = getAllInstitutions($conn);
         .header-section {
             text-align: center;
             margin-bottom: 40px;
+            margin-top:20px;
         }
 
         .logo-icon {
@@ -663,6 +713,16 @@ $institutions = getAllInstitutions($conn);
     </style>
 </head>
 <body>
+          <header>
+        <div class="container">
+            <nav>
+                <div class="logo"   onclick="window.location.href='index.php'">🔍 TruthUncovered</div>
+                <div class="nav-actions">
+                    <a href="index.php" class="back-button"> ←  Back to Home Page</a>
+                </div>
+            </nav>
+        </div>
+         </header>
     <div class="background-image"></div>
 
     <div class="bg-animation">
@@ -673,6 +733,8 @@ $institutions = getAllInstitutions($conn);
     </div>
 
     <div class="main-container">
+     
+   
         <div class="header-section">
             <div class="logo-icon"></div>
             <h1 class="page-title">INSTITUTION RANKINGS</h1>
@@ -1125,57 +1187,3 @@ $institutions = getAllInstitutions($conn);
 </body>
 </html>
 
-<?php
-/*
-Updated SQL schema for the dynamic ranking system:
-
--- Institutions table with 20 predefined institutions
-CREATE TABLE institutions (
-    Institution_ID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(255) NOT NULL,
-    Type ENUM('Government', 'Police', 'NGO') NOT NULL,
-    Region VARCHAR(100) NOT NULL,
-    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Updated Rankings table with new categories and 0-10 scoring
-CREATE TABLE rankings (
-    Ranking_ID INT PRIMARY KEY AUTO_INCREMENT,
-    Institution_ID INT NOT NULL,
-    User_ID INT NOT NULL,
-    Score INT NOT NULL CHECK (Score >= 0 AND Score <= 10),
-    Category ENUM('Corruption', 'Harassment', 'Public Hazards', 'Dowry', 'Antisocial Behavior') NOT NULL,
-    Description TEXT NOT NULL,
-    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (Institution_ID) REFERENCES institutions(Institution_ID) ON DELETE CASCADE,
-    FOREIGN KEY (User_ID) REFERENCES users(User_ID) ON DELETE CASCADE,
-    INDEX idx_institution_rankings (Institution_ID),
-    INDEX idx_user_rankings (User_ID),
-    INDEX idx_category (Category)
-);
-
--- Insert the 20 institutions
-INSERT INTO institutions (Institution_ID, Name, Type, Region) VALUES
-(1, 'Anti-Corruption Commission', 'Government', 'Dhaka'),
-(2, 'Dhaka Metropolitan Police', 'Police', 'Dhaka'),
-(3, 'Bangladesh Police Headquarters', 'Police', 'Dhaka'),
-(4, 'Ministry of Home Affairs', 'Government', 'Dhaka'),
-(5, 'Ministry of Women and Children Affairs', 'Government', 'Dhaka'),
-(6, 'Bangladesh Bank', 'Government', 'Dhaka'),
-(7, 'National Board of Revenue', 'Government', 'Dhaka'),
-(8, 'Rapid Action Battalion - RAB', 'Police', 'Dhaka'),
-(9, 'Detective Branch - DB', 'Police', 'Dhaka'),
-(10, 'Traffic Police', 'Police', 'Dhaka'),
-(11, 'Transparency International Bangladesh', 'NGO', 'Dhaka'),
-(12, 'BRAC', 'NGO', 'Dhaka'),
-(13, 'Ain o Salish Kendra', 'NGO', 'Dhaka'),
-(14, 'Bangladesh Legal Aid and Services Trust', 'NGO', 'Dhaka'),
-(15, 'Manusher Jonno Foundation', 'NGO', 'Dhaka'),
-(16, 'Odhikar', 'NGO', 'Dhaka'),
-(17, 'Bangladesh Environmental Lawyers Association', 'NGO', 'Dhaka'),
-(18, 'Dhaka Ahsania Mission', 'NGO', 'Dhaka'),
-(19, 'Proshika', 'NGO', 'Dhaka'),
-(20, 'ActionAid Bangladesh', 'NGO', 'Dhaka');
-
-*/
-?>

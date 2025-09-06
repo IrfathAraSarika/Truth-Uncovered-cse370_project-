@@ -8,10 +8,12 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 // Fetch all users (or just the logged-in user)
 $sql = "SELECT User_ID, Name, Email, Password, Role FROM Users";
 $result = $conn->query($sql);
 $users = $result->fetch_all(MYSQLI_ASSOC);
+
 
 // Get logged-in user's role
 if (isset($_SESSION['user_id'])) {
@@ -33,6 +35,27 @@ if (isset($_GET['logout'])) {
 }
 
 
+
+
+
+$sql_reports = "SELECT * FROM reports";
+$result_reports = $conn->query($sql_reports);
+
+if ($result_reports) {
+    // Count number of rows
+    $report_count = $result_reports->num_rows;
+
+    // Fetch all rows (optional)
+    $reports = $result_reports->fetch_all(MYSQLI_ASSOC);
+
+    // Pass data to JavaScript
+    echo "<script>
+        console.log('Total reports: ' + $report_count);
+        console.log(" . json_encode($reports) . ");
+    </script>";
+} else {
+    echo "<script>console.error('Query failed: " . $conn->error . "');</script>";
+}
 ?>
 
 <!DOCTYPE html>
@@ -191,6 +214,7 @@ if (isset($_GET['logout'])) {
             border-radius: 24px;
             padding: 3rem;
             margin-bottom: 3rem;
+            margin-top:2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -1168,7 +1192,7 @@ if (!empty($_SESSION['notification'])): ?>
                 <h3 class="widget-title">📊 Platform Analytics</h3>
                 <div class="analytics-grid">
                     <div class="metric-card">
-                        <div class="metric-value">1,247</div>
+                        <div class="metric-value"> <?php echo count($reports); ?></div>
                         <div class="metric-label">Total Reports</div>
                     </div>
                     <div class="metric-card">

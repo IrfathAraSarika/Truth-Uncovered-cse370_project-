@@ -100,9 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height:1.6; color:#e5e7eb;
-           background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1e3a8a 100%);
-           min-height:100vh; overflow-x:hidden; }
+    body {
+      
+      font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height:1.6; color:#e5e7eb;
+    background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e, #0f3460, #1e3a8a);
+      color: #fff;
+           min-height:100vh; overflow-x:hidden;
+          
+          
+          }
     .bg-animation { position:fixed; inset:0; pointer-events:none; z-index:-1; }
     .floating-orb { position:absolute; border-radius:50%; background:linear-gradient(45deg, rgba(59,130,246,0.1), rgba(147,51,234,0.1)); animation: float 6s ease-in-out infinite; }
     .orb1 { width: 300px; height: 300px; top: 10%; left: 80%; animation-delay: 0s; }
@@ -121,10 +127,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .form { display:grid; gap:1.5rem; }
     .form-label { display:block; margin-bottom:.5rem; color:#e2e8f0; font-weight:600; font-size: 1rem; }
-    .input, .textarea, .select { width:100%; padding:1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color:#fff; outline:none; font-size: 1rem; }
+    .input, .textarea, 
+    .select { width:100%; padding:1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.2);
+       background: rgba(255,255,255,0.1); color:#fff; outline:none; font-size: 1rem;
+       appearance: none; }
+        .select:focus { border-color: rgba(59,130,246,0.5); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .select option {
+     background: rgba(31, 29, 29, 0.95); /* grayish background */
+  color: #fff;      /* white text for options */
+}
     .textarea { min-height:300px; resize:vertical; font-family: inherit; }
     .input::placeholder, .textarea::placeholder { color:#cbd5e1; }
-    .input:focus, .textarea:focus, .select:focus { border-color: rgba(59,130,246,0.5); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .input:focus, .textarea:focus, 
+   
 
     .primary-btn { padding:1rem 2rem; background: linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; border-radius:12px; cursor:pointer; font-weight:700; font-size: 1rem; transition: all 0.2s ease; }
     .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.3); }

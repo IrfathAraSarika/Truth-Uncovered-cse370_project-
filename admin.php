@@ -634,6 +634,10 @@ $agencies = [
             outline: none;
             transition: all 0.3s ease;
         }
+        .form-select option {
+      background: rgba(31, 29, 29, 0.95); /* grayish background */
+     color: #fff;      /* white text for options */
+}
 
         .form-input:focus, .form-select:focus {
             background: rgba(255, 255, 255, 0.08);
