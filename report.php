@@ -279,11 +279,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       
       <div class="form-group">
-        <label for="report_file">Evidence (Photos, Videos, Documents)</label>
-        <input type="file" name="report_file[]" id="report_file" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
-        <small style="color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-top: 5px; display: block;">
-          Supported formats: Images, Videos, PDF, Word documents. Max 5MB per file.
-        </small>
+        <label for="report_file">Evidence (Photos only)</label>
+        <input type="file" name="report_file[]" id="report_file" multiple accept="image/*">
+      
       </div>
 
       <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
@@ -292,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       
       <div style="text-align: center; margin-top: 15px;">
         <a href="index.php" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem;">
-          ← Back to Dashboard
+          ← Back to Home page
         </a>
       </div>
     </form>

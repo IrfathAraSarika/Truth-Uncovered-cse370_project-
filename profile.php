@@ -799,7 +799,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <header>
         <div class="container">
             <nav>
-                <div class="logo">TruthUncovered</div>
+                 <div class="logo"  >🔍 TruthUncovered</div>
                 <div class="nav-actions">
                     <a href="index.php" class="back-button">← Back to Home Page</a>
                 </div>
