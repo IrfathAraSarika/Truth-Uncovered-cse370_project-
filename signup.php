@@ -654,7 +654,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select class="form-select" id="role" name="role" required>
                             <option value="" disabled selected>Select Role</option>
                             <option value="Citizen">Citizen Investigator</option>
-                            <option value="Admin">Administrator</option>
                             <option value="NGO_Partner">NGO Partner</option>
                             <option value="Govt_Officer">Government Officer</option>
                         </select>
